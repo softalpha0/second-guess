@@ -5,8 +5,26 @@ import { h, kbd } from '../ui';
 import { session } from '../app';
 import { beginStudy } from '../flow';
 
+function deckMeta(d: DeckSummary): string {
+  const parts: string[] = [];
+  if (d.due) parts.push(`${d.due} due`);
+  if (d.fresh) parts.push(d.fresh === d.count ? `${d.count} new` : `${d.fresh} new`);
+  if (!d.due && !d.fresh) parts.push('all caught up');
+  parts.push(`${d.count} cards`);
+  if (d.source === 'imported') parts.push('imported');
+  return parts.join(' · ');
+}
+
 export const decksScreen: Screen = async (root, go) => {
   let decks: DeckSummary[] = await window.sg.listDecks();
+  const info = await window.sg.info();
+  if (info.loadError || !info.hasKey) {
+    session.noCamera = true;
+    session.noCameraReason = info.loadError
+      ? 'The camera part (SmartSpectra SDK) could not load on this computer.'
+      : 'No Presage API key was found, so the camera can\u2019t be used.';
+  }
+  const canUseCamera = !info.loadError && info.hasKey;
   let selected = 0;
   const list = h('ul.deck-list', { role: 'listbox' });
   const message = h('div.notice');
@@ -25,7 +43,7 @@ export const decksScreen: Screen = async (root, go) => {
           `li.deck${i === selected ? '.selected' : ''}`,
           { role: 'option', 'aria-selected': i === selected, onclick: () => { selected = i; render(); }, ondblclick: () => void study() },
           h('span.deck-name', {}, d.name),
-          h('span.deck-meta', {}, `${d.count} cards${d.source === 'imported' ? ' · imported' : ''}`),
+          h('span.deck-meta', {}, deckMeta(d)),
           h('button.btn.small', { onclick: (e: Event) => { e.stopPropagation(); selected = i; void study(); } }, 'Study'),
         ),
       ),
@@ -67,8 +85,12 @@ export const decksScreen: Screen = async (root, go) => {
   }
 
   const modeLine = session.noCamera
-    ? h('div.notice', {}, 'You chose to study without the camera (plain flashcards). ',
-        h('button.btn.small', { onclick: () => { session.noCamera = false; go('decks'); } }, 'Use the camera again'))
+    ? h('div.notice.nocam', {},
+        h('strong', {}, 'No camera mode — plain flashcards. '),
+        `${session.noCameraReason ?? ''} Cards are still scheduled, but right answers aren\u2019t checked for hesitation. `,
+        canUseCamera
+          ? h('button.btn.small', { onclick: () => { session.noCamera = false; session.noCameraReason = null; go('decks'); } }, 'Use the camera again')
+          : h('span.small.muted', {}, 'To turn it on: add SMARTSPECTRA_API_KEY to the .env file and restart the app.'))
     : null;
 
   root.append(

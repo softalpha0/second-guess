@@ -18,6 +18,8 @@ const api: SgApi = {
   importDeck: () => ipcRenderer.invoke('store:import-deck'),
   deleteDeck: (id) => ipcRenderer.invoke('store:delete-deck', id),
   addReviews: (reviews) => ipcRenderer.invoke('store:add-reviews', reviews),
+  getSchedule: (deckId) => ipcRenderer.invoke('store:get-schedule', deckId),
+  saveCardStates: (states) => ipcRenderer.invoke('store:save-card-states', states),
   onEvent: (cb) => {
     const listener = (_e: IpcRendererEvent, ev: SdkEvent) => cb(ev);
     ipcRenderer.on('sdk:event', listener);

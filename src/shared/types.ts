@@ -2,6 +2,7 @@
 import type { LiveSnapshot } from '../core/live-metrics';
 import type { Card } from '../core/deck-import';
 import type { RecallSignals } from '../core/signals';
+import type { CardState } from '../core/scheduler';
 
 export type SdkEvent =
   | { type: 'processing'; status: number; name: string }
@@ -47,6 +48,9 @@ export interface DeckSummary {
   name: string;
   source: 'builtin' | 'imported';
   count: number;
+  /** Cards due today or earlier, and never-studied cards (M7). */
+  due?: number;
+  fresh?: number;
 }
 
 export interface ImportOutcome {
@@ -103,4 +107,7 @@ export interface SgApi {
   importDeck(): Promise<ImportOutcome>;
   deleteDeck(id: string): Promise<boolean>;
   addReviews(reviews: Review[]): Promise<void>;
+  /** M7: saved schedule for a deck, keyed "deckId|cardId". */
+  getSchedule(deckId: string): Promise<Record<string, CardState>>;
+  saveCardStates(states: CardState[]): Promise<void>;
 }

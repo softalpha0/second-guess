@@ -49,6 +49,19 @@ export class StudySession {
     return { index: Math.min(this.i + 1, this.queue.length), total: this.queue.length };
   }
 
+  /**
+   * Wrong answer: bring the card back later in this session, `gap` cards from
+   * now (or at the end if fewer are left). Call after answer().
+   */
+  requeue(card: Card, gap = 3): void {
+    const at = Math.min(this.i + gap, this.queue.length);
+    this.queue.splice(at, 0, card);
+    if (this.phase === 'done') {
+      this.phase = 'front';
+      this.shownAt = this.revealedAt;
+    }
+  }
+
   /** Space: show the answer. Returns the recall time, or null if not on a front. */
   reveal(now: number): number | null {
     if (this.phase !== 'front') return null;

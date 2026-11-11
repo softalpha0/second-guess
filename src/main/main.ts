@@ -8,6 +8,7 @@ import { SdkSession } from './sdk';
 import { writeReport } from './report';
 import { Store } from './store';
 import type { Review, SdkEvent, Settings } from '../shared/types';
+import type { CardState } from '../core/scheduler';
 
 // .env sits in the project folder next to package.json.
 loadEnv({ path: join(app.getAppPath(), '.env'), quiet: true });
@@ -84,6 +85,8 @@ ipcMain.handle('store:list-decks', () => store.listDecks());
 ipcMain.handle('store:get-deck', (_e, id: string) => store.getDeck(id));
 ipcMain.handle('store:delete-deck', (_e, id: string) => store.deleteDeck(id));
 ipcMain.handle('store:add-reviews', (_e, reviews: Review[]) => store.addReviews(reviews));
+ipcMain.handle('store:get-schedule', (_e, deckId: string) => store.getSchedule(deckId));
+ipcMain.handle('store:save-card-states', (_e, states: CardState[]) => store.saveCardStates(states));
 ipcMain.handle('store:import-deck', async () => {
   const res = await dialog.showOpenDialog(win!, {
     title: 'Import a deck',

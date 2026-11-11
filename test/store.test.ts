@@ -50,6 +50,20 @@ describe('store', () => {
     expect(s.getReviews()).toEqual([]);
   });
 
+  it('saves the schedule and shows due / new counts per deck', () => {
+    const dir = tmp();
+    const s = new Store(dir, join(__dirname, '..', 'decks'));
+    const deck = s.getDeck('builtin:capitals')!;
+    const st = (cardId: string, due: string) => ({
+      deckId: deck.id, cardId, intervalDays: 1, due, reps: 1, lapses: 0, hesitations: 0, last: 'sure' as const, lastReviewed: '2026-11-15',
+    });
+    s.saveCardStates([st(deck.cards[0].id, '2026-11-16'), st(deck.cards[1].id, '2026-11-20')]);
+    const caps = s.listDecks('2026-11-16').find((d) => d.id === deck.id)!;
+    expect(caps).toMatchObject({ due: 1, fresh: 28 });
+    expect(Object.keys(s.getSchedule(deck.id))).toHaveLength(2);
+    expect(Object.keys(s.getSchedule('builtin:spanish'))).toHaveLength(0);
+  });
+
   it('delete all removes settings, imported decks and reviews', () => {
     const dir = tmp();
     const s = new Store(dir, dir);

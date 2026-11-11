@@ -15,6 +15,7 @@ export const consentScreen: Screen = (root, go, params) => {
   }
   function withoutCamera(): void {
     session.noCamera = true;
+    session.noCameraReason = 'You chose to study without the camera.';
     go('study', params);
   }
   cont.addEventListener('click', () => void agree());

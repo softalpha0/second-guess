@@ -4,6 +4,7 @@
 
 import type { SdkEvent } from '../shared/types';
 import type { Baseline } from '../core/baseline';
+import type { SessionSummary } from '../core/summary';
 
 export interface CameraStatus {
   on: boolean;
@@ -64,6 +65,10 @@ export const session = {
   noCamera: false,
   /** Deck being studied, so "Turn camera back on" can come back to it. */
   deckId: null as string | null,
+  /** Why we're in no-camera mode, in plain words (M9). */
+  noCameraReason: null as string | null,
+  /** Last finished session, for the summary screen (M8). */
+  lastSummary: null as (SessionSummary & { deckId: string; deckName: string; practice: boolean }) | null,
 };
 
 /** Top-of-window banner (e.g. "Camera off — plain flashcards"), with an optional button. */

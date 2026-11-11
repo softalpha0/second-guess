@@ -116,6 +116,7 @@ export const cameraCheckScreen: Screen = async (root, go, params) => {
   }
   function withoutCamera(): void {
     session.noCamera = true;
+    session.noCameraReason = problem ?? 'You chose to study without the camera.';
     void window.sg.stop('internal');
     go('study', params);
   }

@@ -9,6 +9,7 @@ import { cameraCheckScreen } from './screens/camera-check';
 import { warmupScreen } from './screens/warmup';
 import { studyScreen } from './screens/study';
 import { sdkCheckScreen } from './screens/sdk-check';
+import { summaryScreen } from './screens/summary';
 
 declare global {
   interface Window {
@@ -20,7 +21,7 @@ export interface ScreenHandle {
   onKey?(e: KeyboardEvent): void;
   dispose?(): void;
 }
-export type ScreenName = 'decks' | 'consent' | 'camera-check' | 'warmup' | 'study' | 'sdk-check';
+export type ScreenName = 'decks' | 'consent' | 'camera-check' | 'warmup' | 'study' | 'sdk-check' | 'summary';
 export type Go = (name: ScreenName, params?: Record<string, string>) => void;
 export type Screen = (root: HTMLElement, go: Go, params: Record<string, string>) => ScreenHandle | void | Promise<ScreenHandle | void>;
 
@@ -31,6 +32,7 @@ const screens: Record<ScreenName, Screen> = {
   warmup: warmupScreen,
   study: studyScreen,
   'sdk-check': sdkCheckScreen,
+  summary: summaryScreen,
 };
 
 const view = document.getElementById('view')!;

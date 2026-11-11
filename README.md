@@ -34,14 +34,14 @@ _Mark honestly what works in the submitted version._
 
 | Feature | Status |
 |---|---|
-| Consent screen + camera check with plain hints | ⬜ |
-| Built-in decks + CSV and Anki import | ⬜ |
-| Keyboard study loop | ⬜ |
-| 60-second personal warm-up | ⬜ |
-| Hesitation score with reasons | ⬜ |
-| Scheduling that brings guesses back sooner, with override | ⬜ |
-| Session summary | ⬜ |
-| Works without a camera (plain flashcards) | ⬜ |
+| Consent screen + camera check with plain hints | ✅ |
+| Built-in decks + CSV and Anki import | ✅ |
+| Keyboard study loop | ✅ |
+| 60-second personal warm-up | ✅ |
+| Hesitation score with reasons | ✅ (weights to be tuned on real study data) |
+| Scheduling that brings guesses back sooner, with override | ✅ |
+| Session summary | ✅ |
+| Works without a camera (plain flashcards) | ✅ |
 | Check mode: measures how often it agrees with you | ⬜ |
 | Signal replay for a card | ⬜ |
 

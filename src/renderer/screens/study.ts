@@ -11,9 +11,13 @@ import { camera, session } from '../app';
 import { flashcard } from '../flashcard';
 import { StudySession, type CardResult } from '../../core/study-session';
 import { scoreHesitation, verdictText, type HesitationResult, type Verdict } from '../../core/hesitation';
+import { addDays, cardKey, pickSession, schedule, toDay, type CardState, type Outcome } from '../../core/scheduler';
+import { summarize, type Attempt } from '../../core/summary';
+import { DEFAULT_SESSION_SIZE } from '../../core/study-session';
 
 interface Answered {
   result: CardResult;
+  retry: boolean;
   signal: Review['signal'];
   hesitation: HesitationResult;
   verdict: Verdict;
@@ -23,6 +27,7 @@ interface Answered {
 type Pending = Promise<{ signals: RecallSignals | null; signal: Review['signal'] }>;
 
 const AUTO_NEXT_MS = 900;
+const MAX_RETRIES = 2; // a wrong card comes back at most twice in one session
 
 export const studyScreen: Screen = async (root, go, params) => {
   if (!params.deckId) return go('decks');
@@ -33,26 +38,41 @@ export const studyScreen: Screen = async (root, go, params) => {
     return { onKey: (e) => e.key === 'Escape' && go('decks') };
   }
 
+  const today = toDay(new Date());
+  const states: Record<string, CardState> = await window.sg.getSchedule(deck.id);
+  const picked = pickSession(deck.cards, deck.id, states, today, DEFAULT_SESSION_SIZE);
+
   const view = flashcard();
   const verdictBox = h('div.verdict');
   verdictBox.hidden = true;
   const body = h('div', {}, view.el, verdictBox);
-  root.append(h('section.page', {}, h('h1', {}, deck.name), body));
+  root.append(
+    h('section.page', {},
+      h('h1', {}, deck.name),
+      session.noCamera
+        ? h('div.notice.nocam.small', {}, h('strong', {}, 'No camera mode — plain flashcards. '), session.noCameraReason ?? '')
+        : null,
+      picked.practice ? h('div.notice.small', {}, 'All caught up! Practising the cards that are due soonest.') : null,
+      body,
+    ),
+  );
 
-  const study = new StudySession(deck.cards, Date.now());
+  const study = new StudySession(picked.cards, Date.now());
+  const failedThisSession = new Set<string>();
+  const retriesLeft = new Map<string, number>();
+  const attempts: Attempt[] = [];
   const answered: Answered[] = [];
   let pending: Pending | null = null;
   let busy = false; // waiting for signals after an answer
   let feedback: Answered | null = null; // verdict on screen, waiting to continue
   let autoTimer: ReturnType<typeof setTimeout> | null = null;
   let done = false;
-  let summaryShown = false;
 
   function show(): void {
     const c = study.current;
     if (!c) return;
     verdictBox.hidden = true;
-    view.setProgress(`Card ${study.position.index} of ${study.position.total}`);
+    view.setProgress(`Card ${study.position.index} of ${study.position.total}${failedThisSession.has(c.id) ? ' · again' : ''}`);
     if (study.phase === 'front') view.showFront(c.front);
     else view.showBack(c.front, c.back);
   }
@@ -86,7 +106,7 @@ export const studyScreen: Screen = async (root, go, params) => {
     verdictBox.replaceChildren(
       h('div.verdict-text', {}, text),
       h('div.verdict-sub', {},
-        hesitated ? 'This card comes back sooner. ' : '',
+        hesitated ? (a.retry ? 'This card comes back tomorrow. ' : 'This card comes back tomorrow instead of later. ') : '',
         kbd('H'), hesitated ? ' No, I knew it    ' : ' Actually, I guessed    ',
         kbd('Space'), ' next',
       ),
@@ -109,7 +129,7 @@ export const studyScreen: Screen = async (root, go, params) => {
       signals: session.noCamera ? null : signals,
       baseline: session.baseline,
     });
-    const a: Answered = { result, signal, hesitation, verdict: hesitation.verdict, overridden: false };
+    const a: Answered = { result, retry: failedThisSession.has(result.card.id), signal, hesitation, verdict: hesitation.verdict, overridden: false };
 
     if (!correct) return commit(a); // wrong: no check, move straight on
     feedback = a;
@@ -144,6 +164,27 @@ export const studyScreen: Screen = async (root, go, params) => {
 
   async function commit(a: Answered): Promise<void> {
     answered.push(a);
+    const id = a.result.card.id;
+    const outcome: Outcome = !a.result.correct
+      ? 'wrong'
+      : a.verdict === 'hesitated' ? 'hesitated' : a.verdict === 'sure' ? 'sure' : 'unjudged';
+    const key = cardKey(deck!.id, id);
+    const next = schedule({ prev: states[key] ?? null, deckId: deck!.id, cardId: id, outcome, today, failedThisSession: failedThisSession.has(id) });
+    states[key] = next;
+    attempts.push({
+      cardId: id, front: a.result.card.front, back: a.result.card.back, correct: a.result.correct,
+      verdict: a.verdict, reasons: a.hesitation.reasons, overridden: a.overridden, retry: a.retry,
+      recallMs: a.result.recallMs, due: next.due,
+    });
+    if (!a.result.correct) {
+      failedThisSession.add(id);
+      const left = retriesLeft.get(id) ?? MAX_RETRIES;
+      if (left > 0) {
+        retriesLeft.set(id, left - 1);
+        study.requeue(a.result.card, 3); // again in this session
+      }
+    }
+    void window.sg.saveCardStates([next]);
     const last = study.current === null;
     if (last) done = true;
     else show();
@@ -175,34 +216,10 @@ export const studyScreen: Screen = async (root, go, params) => {
 
   function finish(): void {
     done = true;
-    const total = answered.length;
-    if (total === 0) return go('decks');
-    const right = answered.filter((a) => a.result.correct);
-    const guessed = right.filter((a) => a.verdict === 'hesitated');
-    const avg = answered.reduce((s, a) => s + a.result.recallMs, 0) / total / 1000;
-    const readings = answered.filter((a) => a.signal === 'good').length;
-    body.replaceChildren(
-      h('div.result', {},
-        h('h2', {}, 'Session done'),
-        h('ul', {},
-          h('li', {}, `${right.length} of ${total} right.`),
-          session.baseline?.signals ? h('li', {}, h('strong', {}, `${guessed.length} right but hesitated`), ' — these come back sooner.') : null,
-          h('li', {}, `Average time to reveal: ${avg.toFixed(1)} s.`),
-          session.noCamera ? null : h('li', {}, `${readings} of ${total} cards had a clear camera reading.`),
-        ),
-        guessed.length
-          ? h('ul.guess-list', {}, ...guessed.map((a) => h('li', {}, h('strong', {}, a.result.card.front), ` — ${a.result.card.back}`,
-              h('span.muted', {}, a.overridden ? '  (you said you guessed)' : a.hesitation.reasons.length ? `  (${a.hesitation.reasons.join(', ')})` : ''))))
-          : null,
-        h('p.small.muted', {}, 'The full summary and scheduling come in the next steps.'),
-        h('div.row', {},
-          h('button.btn.primary', { onclick: () => go('decks') }, 'Back to decks'),
-          h('button.btn', { onclick: () => go('study', params) }, 'Study again'),
-        ),
-        h('p.keys', {}, kbd('Enter'), ' back to decks   ', kbd('A'), ' study again'),
-      ),
-    );
-    summaryShown = true;
+    if (attempts.length === 0) return go('decks');
+    const checked = !session.noCamera && !!session.baseline?.signals;
+    session.lastSummary = { ...summarize(attempts, addDays(today, 1), checked), deckId: deck!.id, deckName: deck!.name, practice: picked.practice };
+    go('summary', { deckId: deck!.id });
   }
 
   show();
@@ -210,12 +227,7 @@ export const studyScreen: Screen = async (root, go, params) => {
   return {
     onKey(e) {
       if (e.repeat) return;
-      if (done) {
-        if (!summaryShown) return;
-        if (e.key === 'Enter' || e.key === 'Escape') go('decks');
-        else if (e.key.toLowerCase() === 'a') go('study', params);
-        return;
-      }
+      if (done) return;
       if (feedback) {
         if (e.key.toLowerCase() === 'h') override();
         else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); void next(); }

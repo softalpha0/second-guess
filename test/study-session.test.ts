@@ -34,3 +34,24 @@ describe('study session', () => {
     expect(shuffle([1, 2, 3, 4, 5]).sort()).toEqual([1, 2, 3, 4, 5]);
   });
 });
+
+describe('again in this session', () => {
+  it('puts a wrong card back a few cards later', () => {
+    const s = new StudySession(cards, 0, { shuffle: false, size: 5 });
+    s.reveal(10);
+    s.answer(false, 20);
+    s.requeue(cards[0], 3);
+    expect(s.queue.map((c) => c.id)).toEqual(['c0', 'c1', 'c2', 'c3', 'c0', 'c4']);
+    expect(s.position.total).toBe(6);
+  });
+
+  it('a wrong last card comes back straight away', () => {
+    const s = new StudySession(cards, 0, { shuffle: false, size: 1 });
+    s.reveal(10);
+    s.answer(false, 20);
+    expect(s.phase).toBe('done');
+    s.requeue(cards[0], 3);
+    expect(s.phase).toBe('front');
+    expect(s.current?.id).toBe('c0');
+  });
+});

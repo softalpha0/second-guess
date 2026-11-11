@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, w
 import { basename, join } from 'node:path';
 import { hashText, importCsv, importDeckFile, type Card } from '../core/deck-import';
 import type { DeckSummary, Deck, Review, Settings, ImportOutcome } from '../shared/types';
+import { cardKey, deckProgress, toDay, type CardState } from '../core/scheduler';
 
 const BUILTIN_NAMES: Record<string, string> = {
   capitals: 'World capitals',
@@ -68,13 +69,26 @@ export class Store {
     return this.read<Deck[]>('decks.json', []);
   }
 
-  listDecks(): DeckSummary[] {
-    return [...this.builtinDecks(), ...this.importedDecks()].map((d) => ({
-      id: d.id,
-      name: d.name,
-      source: d.source,
-      count: d.cards.length,
-    }));
+  listDecks(today = toDay(new Date())): DeckSummary[] {
+    const states = this.allStates();
+    return [...this.builtinDecks(), ...this.importedDecks()].map((d) => {
+      const p = deckProgress(d.cards.map((c) => c.id), d.id, states, today);
+      return { id: d.id, name: d.name, source: d.source, count: d.cards.length, due: p.due, fresh: p.fresh };
+    });
+  }
+
+  private allStates(): Record<string, CardState> {
+    return this.read<Record<string, CardState>>('schedule.json', {});
+  }
+
+  getSchedule(deckId: string): Record<string, CardState> {
+    return Object.fromEntries(Object.entries(this.allStates()).filter(([, s]) => s.deckId === deckId));
+  }
+
+  saveCardStates(states: CardState[]): void {
+    const all = this.allStates();
+    for (const s of states) all[cardKey(s.deckId, s.cardId)] = s;
+    this.write('schedule.json', all);
   }
 
   getDeck(id: string): Deck | null {
@@ -106,6 +120,10 @@ export class Store {
     const next = decks.filter((d) => d.id !== id);
     if (next.length === decks.length) return false;
     this.write('decks.json', next);
+    // forget its schedule too
+    const states = this.allStates();
+    for (const k of Object.keys(states)) if (states[k].deckId === id) delete states[k];
+    this.write('schedule.json', states);
     return true;
   }
 
@@ -121,6 +139,6 @@ export class Store {
 
   /** Settings → Delete all data (used from S4; available now for testing). */
   deleteAll(): void {
-    for (const f of ['settings.json', 'decks.json', 'reviews.json']) rmSync(join(this.dataDir, f), { force: true });
+    for (const f of ['settings.json', 'decks.json', 'reviews.json', 'schedule.json']) rmSync(join(this.dataDir, f), { force: true });
   }
 }

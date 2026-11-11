@@ -45,6 +45,15 @@ Rules:
   - Reasons: top two with ≥8 points. Poor window → "no reading" (not judged). Wrong / camera off → not checked.
   - Sure verdicts auto-advance after 0.9 s; hesitated waits for Space. H toggles the verdict (overridden: true).
   - Reviews now also store verdict, score, reasons, overridden, parts (points per signal) for tuning.
+- M7 scheduler (src/core/scheduler.ts), stored in schedule.json keyed "deckId|cardId", local dates YYYY-MM-DD.
+  sure → grow 1→3→7→16→×2.2; **a NEW card answered sure starts at 3 days** (so a lucky guess differs from day one;
+  confirm with the user); hesitated → tomorrow, interval not grown; wrong → requeued 3 cards later (max 2 retries)
+  and due tomorrow with interval 0; right on a retry → tomorrow; no reading / camera off → normal growth.
+  Session = due cards (most overdue first) + new cards, max 20, shuffled; if none, "practice" with soonest-due.
+- M8 summary screen (src/core/summary.ts): cards judged by first attempt, schedule by last; tomorrow list shows only
+  missed/hesitated cards plus a count of others due tomorrow.
+- M9 no-camera mode: no key or SDK load failure → plain flashcards automatically (skips consent/camera check), notice on
+  decks and study screens; user can also choose it. Cards still scheduled; right answers count as "not judged".
 
 ## SDK findings (M1)
 
