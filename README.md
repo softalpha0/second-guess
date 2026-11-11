@@ -5,9 +5,8 @@
 You got it right — but did you *know* it? Second Guess watches for hesitation while you recall an answer, using your webcam and the [Presage SmartSpectra SDK](https://github.com/Presage-Security/SmartSpectra). When a right answer was really a guess, it brings that card back tomorrow instead of next week.
 
 ![Right — but you hesitated](docs/screenshots/hesitated.gif)
-_Add a GIF of a caught guess._
 
-- **Demo video:** _add link_
+- **Demo video (1:27):** https://youtu.be/Bw7pHNqaJRY
 - **DEV post:** _add link_
 
 Built for the **Presage SmartSpectra SDK Challenge** on DEV.
@@ -27,6 +26,16 @@ Flashcard apps decide when you'll see a card again from your own rating. But peo
 3. **Study.** See the question, think, press **Space**, mark **Right** or **Wrong**.
 4. If you were right but hesitated — a long pause, looking away, holding your breath — you'll see **"Right — but you hesitated"** and the card comes back tomorrow. Disagree? Press **H** to override.
 5. **Review** your session: which right answers were guesses, and what's coming back.
+
+## Screenshots
+
+All taken from the real app on my laptop with a real webcam.
+
+| | |
+|---|---|
+| ![Right — but you hesitated](docs/screenshots/hesitated.png) **A caught guess**: right answer, but a long pause → back tomorrow | ![Live SDK signals](docs/screenshots/sdk-live-signals.png) **Live SDK signals**: breathing, blinks, expressions, 478 face points (numbers only) |
+| ![Camera check](docs/screenshots/camera-check.png) **Camera check**: plain hints and a face-points "mirror" — no video | ![Warm-up](docs/screenshots/warmup.png) **60-second warm-up** learns your normal pace |
+| ![Session summary](docs/screenshots/summary.png) **Session summary** | ![Signal replay and Check mode](docs/screenshots/signal-replay.png) **Check mode result and signal replay** |
 
 ## Features
 

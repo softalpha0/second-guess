@@ -13,14 +13,16 @@ Flashcard apps decide when you'll see a card again from **your own rating** — 
 
 **Second Guess** watches for hesitation *while you recall* an answer. When you get a card right but hesitated, it says so — **"Right — but you hesitated: long pause, looked away"** — and brings that card back **tomorrow** instead of next week.
 
-![A caught guess](docs/screenshots/hesitated.gif)
+![A caught guess](https://raw.githubusercontent.com/softalpha0/second-guess/main/docs/screenshots/hesitated.gif)
 
 ## Demo
 
-[VIDEO LINK — ≤ 2 min]
+{% embed https://youtu.be/Bw7pHNqaJRY %}
 
-![Summary](docs/screenshots/summary.png)
-![Signal replay](docs/screenshots/replay.png)
+![Live SDK signals](https://raw.githubusercontent.com/softalpha0/second-guess/main/docs/screenshots/sdk-live-signals.png)
+![Camera check with face-points mirror](https://raw.githubusercontent.com/softalpha0/second-guess/main/docs/screenshots/camera-check.png)
+![Session summary](https://raw.githubusercontent.com/softalpha0/second-guess/main/docs/screenshots/summary.png)
+![Check mode result and signal replay](https://raw.githubusercontent.com/softalpha0/second-guess/main/docs/screenshots/signal-replay.png)
 
 ## Code
 
