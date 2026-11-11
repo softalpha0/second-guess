@@ -18,7 +18,7 @@ vi.mock('electron', () => ({
 const { KeyStore } = await import('../src/main/keystore');
 
 const dir = () => mkdtempSync(join(tmpdir(), 'sg-key-'));
-const KEY = 'pk_live_abcdefghijklmnop1234';
+const KEY = 'test-key-abcdefghijklmnop1234';
 
 describe('API key store', () => {
   it('saves encrypted, prefers the Settings key over .env, and only reveals the last 4 characters', () => {

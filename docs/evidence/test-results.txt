@@ -1,0 +1,106 @@
+ ✓ test/scheduler.test.ts > intervals > grow 1 → 3 → 7 → 16 → 35 2ms
+ ✓ test/scheduler.test.ts > intervals > dates roll over months and years 0ms
+ ✓ test/scheduler.test.ts > schedule > confident right answers space out (a new card starts at 3 days) 0ms
+ ✓ test/scheduler.test.ts > schedule > a new card: knew it → 3 days, hesitated → tomorrow, not judged → 1 day 0ms
+ ✓ test/scheduler.test.ts > schedule > a hesitated right answer comes back tomorrow and does not grow 0ms
+ ✓ test/scheduler.test.ts > schedule > wrong resets the interval and comes back tomorrow 1ms
+ ✓ test/scheduler.test.ts > schedule > right on the retry in the same session still comes back tomorrow 0ms
+ ✓ test/scheduler.test.ts > schedule > a second miss in the same session is not another lapse 0ms
+ ✓ test/scheduler.test.ts > schedule > right but not judged (no reading) is scheduled normally 0ms
+ ✓ test/scheduler.test.ts > picking a session > due cards first (most overdue first), then new ones 5ms
+ ✓ test/scheduler.test.ts > picking a session > when everything is done, offers practice with the soonest cards 0ms
+ ✓ test/scheduler.test.ts > picking a session > respects the session size 1ms
+ ✓ test/scheduler.test.ts > wording > says today / tomorrow / in N days 0ms
+ ✓ test/signals.test.ts > head and eye direction > is centred for a forward face 2ms
+ ✓ test/signals.test.ts > head and eye direction > detects a head turn and an eye shift 0ms
+ ✓ test/signals.test.ts > head and eye direction > rejects too few points 0ms
+ ✓ test/signals.test.ts > head and eye direction > works without iris points (468-point mesh) 0ms
+ ✓ test/signals.test.ts > clock aligner > uses the smallest delay seen 0ms
+ ✓ test/signals.test.ts > recall window > reports good quality, blinks and thinned series 9ms
+ ✓ test/signals.test.ts > recall window > marks a window as poor when the camera signal is not Ok 4ms
+ ✓ test/signals.test.ts > recall window > marks a window as poor when there are no face readings 0ms
+ ✓ test/signals.test.ts > recall window > treats time after the camera stopped as no reading 4ms
+ ✓ test/store.test.ts > store > lists the built-in decks with 30 cards each 3ms
+ ✓ test/store.test.ts > store > imports, lists and deletes a deck 2ms
+ ✓ test/store.test.ts > store > refuses a file with no usable cards 0ms
+ ✓ test/store.test.ts > store > saves settings and reviews, and survives a damaged file 1ms
+ ✓ test/store.test.ts > store > saves the schedule and shows due / new counts per deck 4ms
+ ✓ test/store.test.ts > store > exports answers as CSV with deck names and card text 1ms
+ ✓ test/store.test.ts > store > delete all removes settings, imported decks and reviews 4ms
+ ✓ test/hesitation.test.ts > single signals > recall time: normal pace counts 0, double counts some, 4× counts fully 1ms
+ ✓ test/hesitation.test.ts > single signals > looked away: counts the longest stretch away, not a quick glance 1ms
+ ✓ test/hesitation.test.ts > single signals > looked away: eyes alone count too 0ms
+ ✓ test/hesitation.test.ts > single signals > looked away: losing the face is not counted as looking away 0ms
+ ✓ test/hesitation.test.ts > single signals > blinks: a burst counts, the usual number does not 1ms
+ ✓ test/hesitation.test.ts > single signals > blinks: no blinks over a long window counts as "stopped blinking" 0ms
+ ✓ test/hesitation.test.ts > single signals > breath: a flat trace for 4 s counts, normal breathing does not 1ms
+ ✓ test/hesitation.test.ts > single signals > expression: compared with your resting face 0ms
+ ✓ test/hesitation.test.ts > hesitation score > a quick, calm right answer is "sure" 1ms
+ ✓ test/hesitation.test.ts > hesitation score > a long pause with looking away is "hesitated", with both reasons 0ms
+ ✓ test/hesitation.test.ts > hesitation score > a very long pause alone is enough 0ms
+ ✓ test/hesitation.test.ts > hesitation score > a slightly slow answer alone is not enough 0ms
+ ✓ test/hesitation.test.ts > hesitation score > poor camera view → not judged ("no reading") 0ms
+ ✓ test/hesitation.test.ts > hesitation score > wrong answers, camera off, or no camera baseline → not checked 0ms
+ ✓ test/hesitation.test.ts > hesitation score > long questions get a reading allowance 0ms
+ ✓ test/hesitation.test.ts > hesitation score > compares with your pace on the real deck once a few answers exist 0ms
+ ✓ test/hesitation.test.ts > hesitation score > uses 1.5× the warm-up pace until there are enough answers 1ms
+ ✓ test/hesitation.test.ts > hesitation score > switched-off signals are ignored 0ms
+ ✓ test/hesitation.test.ts > hesitation score > threshold is adjustable 0ms
+ ✓ test/hesitation.test.ts > hesitation score > never uses health or feeling words 0ms
+ ✓ test/field-schema.test.ts > field schema recorder > records nested fields, types, ranges and array lengths 8ms
+ ✓ test/field-schema.test.ts > field schema recorder > collects distinct string values such as expression names 0ms
+ ✓ test/field-schema.test.ts > field schema recorder > samples very long arrays without walking every item 0ms
+ ✓ test/field-schema.test.ts > field schema recorder > truncates arrays for readable samples 0ms
+ ✓ test/shoulds.test.ts > S1 check mode agreement > counts caught guesses, misses, false alarms and agreement 2ms
+ ✓ test/shoulds.test.ts > S1 check mode agreement > says so when there is nothing yet 0ms
+ ✓ test/shoulds.test.ts > S3 progress > counts lucky cards that became sure, and per-day results 6ms
+ ✓ test/shoulds.test.ts > S3 progress > in Check mode the student's own answer counts 0ms
+ ✓ test/shoulds.test.ts > S2 replay tracks > scales head distance to the looked-away line and finds flat breathing 1ms
+ ✓ test/shoulds.test.ts > S2 replay tracks > returns null without a camera baseline 0ms
+ ✓ test/shoulds.test.ts > CSV export > quotes commas and quotes, and blocks formulas 0ms
+ ✓ test/shoulds.test.ts > CSV export > writes a header and one row per answer 0ms
+ ✓ test/deck-import.test.ts > CSV import > reads front,back rows and skips a header 2ms
+ ✓ test/deck-import.test.ts > CSV import > handles quotes, commas and newlines inside quotes, and Windows line endings 1ms
+ ✓ test/deck-import.test.ts > CSV import > reports rows it cannot use, with line numbers 1ms
+ ✓ test/deck-import.test.ts > CSV import > ignores blank lines and a byte-order mark 0ms
+ ✓ test/deck-import.test.ts > CSV import > gives the same card the same id every time 0ms
+ ✓ test/deck-import.test.ts > Anki plain-text import > reads tab-separated notes with header lines and HTML 1ms
+ ✓ test/deck-import.test.ts > Anki plain-text import > respects #separator:semicolon and #html:false 0ms
+ ✓ test/deck-import.test.ts > Anki plain-text import > keeps line numbers correct after header lines 0ms
+ ✓ test/deck-import.test.ts > Anki plain-text import > ignores extra columns such as tags 0ms
+ ✓ test/deck-import.test.ts > format detection > uses CSV for .csv and Anki for tab text 0ms
+ ✓ test/deck-import.test.ts > helpers > stripHtml decodes numeric entities and drops tags 0ms
+ ✓ test/deck-import.test.ts > helpers > parseDelimited keeps empty trailing fields 0ms
+ ✓ test/study-session.test.ts > study session > goes front → reveal → answer and records recall time 3ms
+ ✓ test/study-session.test.ts > study session > takes 20 cards by default, shuffled 1ms
+ ✓ test/study-session.test.ts > study session > handles an empty deck 0ms
+ ✓ test/study-session.test.ts > study session > shuffle keeps every item exactly once 0ms
+ ✓ test/study-session.test.ts > again in this session > puts a wrong card back a few cards later 0ms
+ ✓ test/study-session.test.ts > again in this session > a wrong last card comes back straight away 0ms
+ ✓ test/keystore.test.ts > API key store > saves encrypted, prefers the Settings key over .env, and only reveals the last 4 characters 5ms
+ ✓ test/keystore.test.ts > API key store > rejects things that are not a key 1ms
+ ✓ test/keystore.test.ts > API key store > remove falls back to .env (or nothing) 1ms
+ ✓ test/tuning.test.ts > tuning report > only uses judged right answers from Check mode 2ms
+ ✓ test/tuning.test.ts > tuning report > reports agreement for the current settings and each threshold 0ms
+ ✓ test/tuning.test.ts > tuning report > prefers the threshold closest to 50 on a tie 0ms
+ ✓ test/tuning.test.ts > tuning report > ranks signals by how well they separate guesses from known answers 1ms
+ ✓ test/tuning.test.ts > tuning report > handles no data 0ms
+ ✓ test/baseline.test.ts > warm-up baseline > uses the median recall time, so one slow card does not skew it 2ms
+ ✓ test/baseline.test.ts > warm-up baseline > ignores wrong answers for recall time 0ms
+ ✓ test/baseline.test.ts > warm-up baseline > learns blink rate, head centre and resting face 1ms
+ ✓ test/baseline.test.ts > warm-up baseline > falls back to recall time only when the camera was off or unclear 1ms
+ ✓ test/baseline.test.ts > warm-up baseline > never goes below a sensible minimum recall time 0ms
+ ✓ test/summary.test.ts > session summary > counts cards by their first attempt 2ms
+ ✓ test/summary.test.ts > session summary > ranks the reasons, ignoring overridden cards 1ms
+ ✓ test/summary.test.ts > session summary > lists cards coming back tomorrow with why 0ms
+ ✓ test/summary.test.ts > session summary > averages recall time over first attempts 0ms
+ ✓ test/summary.test.ts > session summary > handles an empty session 0ms
+ ✓ test/camera-hints.test.ts > camera hints > turns SDK codes into plain words 1ms
+ ✓ test/camera-hints.test.ts > ready gate > is ready only after Ok holds for 2 seconds without a break 0ms
+ ✓ test/live-metrics.test.ts > live tracker > shows the newest pulse and breathing rate 1ms
+ ✓ test/live-metrics.test.ts > live tracker > counts each blink once, even if readings are resent 0ms
+ ✓ test/live-metrics.test.ts > live tracker > does not duplicate resent breathing trace points 1ms
+ ✓ test/live-metrics.test.ts > live tracker > keeps only the last 20 seconds of breathing trace 0ms
+ ✓ test/live-metrics.test.ts > live tracker > sorts expression scores, highest first 0ms
+ Test Files  14 passed (14)
+      Tests  104 passed (104)

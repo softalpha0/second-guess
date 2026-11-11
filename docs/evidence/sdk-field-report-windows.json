@@ -1,0 +1,818 @@
+{
+  "createdAt": "2026-11-11T09:19:49.721Z",
+  "sdkVersion": "3.5.0",
+  "platform": "win32-x64",
+  "metricSet": "full (breathing + pulse + face + expressions)",
+  "requestedMetrics": [
+    "CHEST_BREATHING",
+    "BREATHING_RATE",
+    "PULSE_RATE",
+    "FACE_LANDMARKS",
+    "BLINKING",
+    "TALKING",
+    "EXPRESSIONS"
+  ],
+  "durationSec": 77.329,
+  "messageCount": 1513,
+  "messagesPerSec": 19.565751529180517,
+  "validationCodesSeen": {
+    "Ok": 1542,
+    "TooDark": 5
+  },
+  "processingStatusesSeen": [
+    "Idle",
+    "Starting",
+    "Running",
+    "Stopping"
+  ],
+  "errorsSeen": [],
+  "fields": [
+    {
+      "path": "breathing",
+      "types": [
+        "object"
+      ],
+      "count": 1116
+    },
+    {
+      "path": "breathing.rate",
+      "types": [
+        "array"
+      ],
+      "count": 11,
+      "minLength": 1,
+      "maxLength": 1
+    },
+    {
+      "path": "breathing.rate[]",
+      "types": [
+        "object"
+      ],
+      "count": 11
+    },
+    {
+      "path": "breathing.rate[].confidence",
+      "types": [
+        "number"
+      ],
+      "count": 1,
+      "example": 45.171043395996094,
+      "min": 45.171043395996094,
+      "max": 45.171043395996094
+    },
+    {
+      "path": "breathing.rate[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 1,
+      "example": true
+    },
+    {
+      "path": "breathing.rate[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 11,
+      "example": 1794388735093414,
+      "min": 1794388735093414,
+      "max": 1794388773028748
+    },
+    {
+      "path": "breathing.rate[].value",
+      "types": [
+        "number"
+      ],
+      "count": 11,
+      "example": 10.106328010559082,
+      "min": 10.106328010559082,
+      "max": 25.89805030822754
+    },
+    {
+      "path": "breathing.upperTrace",
+      "types": [
+        "array"
+      ],
+      "count": 1114,
+      "minLength": 1,
+      "maxLength": 4
+    },
+    {
+      "path": "breathing.upperTrace[]",
+      "types": [
+        "object"
+      ],
+      "count": 1393
+    },
+    {
+      "path": "breathing.upperTrace[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 336,
+      "example": true
+    },
+    {
+      "path": "breathing.upperTrace[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 1393,
+      "example": 1794388723748524,
+      "min": 1794388723748524,
+      "max": 1794388778726368
+    },
+    {
+      "path": "breathing.upperTrace[].value",
+      "types": [
+        "number"
+      ],
+      "count": 1386,
+      "example": -0.008181127719581127,
+      "min": -3.1338305473327637,
+      "max": 4.340437412261963
+    },
+    {
+      "path": "cardio",
+      "types": [
+        "object"
+      ],
+      "count": 2
+    },
+    {
+      "path": "cardio.pulseRate",
+      "types": [
+        "array"
+      ],
+      "count": 2,
+      "minLength": 1,
+      "maxLength": 1
+    },
+    {
+      "path": "cardio.pulseRate[]",
+      "types": [
+        "object"
+      ],
+      "count": 2
+    },
+    {
+      "path": "cardio.pulseRate[].confidence",
+      "types": [
+        "number"
+      ],
+      "count": 2,
+      "example": 78.32069396972656,
+      "min": 59.244441986083984,
+      "max": 78.32069396972656
+    },
+    {
+      "path": "cardio.pulseRate[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 2,
+      "example": true
+    },
+    {
+      "path": "cardio.pulseRate[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 2,
+      "example": 1794388734521524,
+      "min": 1794388734521524,
+      "max": 1794388776280041
+    },
+    {
+      "path": "cardio.pulseRate[].value",
+      "types": [
+        "number"
+      ],
+      "count": 2,
+      "example": 71.84064483642578,
+      "min": 56.85407257080078,
+      "max": 71.84064483642578
+    },
+    {
+      "path": "face",
+      "types": [
+        "object"
+      ],
+      "count": 1482
+    },
+    {
+      "path": "face.blinking",
+      "types": [
+        "array"
+      ],
+      "count": 1024,
+      "minLength": 1,
+      "maxLength": 2
+    },
+    {
+      "path": "face.blinking[]",
+      "types": [
+        "object"
+      ],
+      "count": 1075
+    },
+    {
+      "path": "face.blinking[].detected",
+      "types": [
+        "boolean"
+      ],
+      "count": 24,
+      "example": true
+    },
+    {
+      "path": "face.blinking[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 1075,
+      "example": true
+    },
+    {
+      "path": "face.blinking[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 1075,
+      "example": 1794388721716533,
+      "min": 1794388721716533,
+      "max": 1794388778726368
+    },
+    {
+      "path": "face.expression",
+      "types": [
+        "array"
+      ],
+      "count": 1011,
+      "minLength": 1,
+      "maxLength": 3
+    },
+    {
+      "path": "face.expression[]",
+      "types": [
+        "object"
+      ],
+      "count": 1208
+    },
+    {
+      "path": "face.expression[].scores",
+      "types": [
+        "array"
+      ],
+      "count": 1208,
+      "minLength": 8,
+      "maxLength": 8
+    },
+    {
+      "path": "face.expression[].scores[]",
+      "types": [
+        "object"
+      ],
+      "count": 9664
+    },
+    {
+      "path": "face.expression[].scores[].confidence",
+      "types": [
+        "number"
+      ],
+      "count": 9664,
+      "example": 1.6317013502120972,
+      "min": 0.00003848517008009367,
+      "max": 99.97016906738281
+    },
+    {
+      "path": "face.expression[].scores[].type",
+      "types": [
+        "string"
+      ],
+      "count": 9664,
+      "example": "ANGRY",
+      "values": [
+        "ANGRY",
+        "CONTEMPT",
+        "DISGUST",
+        "FEAR",
+        "HAPPY",
+        "NEUTRAL",
+        "SAD",
+        "SURPRISE"
+      ]
+    },
+    {
+      "path": "face.expression[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 1208,
+      "example": true
+    },
+    {
+      "path": "face.expression[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 1208,
+      "example": 1794388724452615,
+      "min": 1794388724452615,
+      "max": 1794388778726368
+    },
+    {
+      "path": "face.landmarks",
+      "types": [
+        "array"
+      ],
+      "count": 1178,
+      "minLength": 1,
+      "maxLength": 5
+    },
+    {
+      "path": "face.landmarks[]",
+      "types": [
+        "object"
+      ],
+      "count": 1413
+    },
+    {
+      "path": "face.landmarks[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 1413,
+      "example": true
+    },
+    {
+      "path": "face.landmarks[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 1413,
+      "example": 1794388723716727,
+      "min": 1794388723716727,
+      "max": 1794388778726368
+    },
+    {
+      "path": "face.landmarks[].value",
+      "types": [
+        "array"
+      ],
+      "count": 1413,
+      "minLength": 478,
+      "maxLength": 478
+    },
+    {
+      "path": "face.landmarks[].value[]",
+      "types": [
+        "object"
+      ],
+      "count": 11304
+    },
+    {
+      "path": "face.landmarks[].value[].x",
+      "types": [
+        "number"
+      ],
+      "count": 11304,
+      "example": 533,
+      "min": 485,
+      "max": 659
+    },
+    {
+      "path": "face.landmarks[].value[].y",
+      "types": [
+        "number"
+      ],
+      "count": 11304,
+      "example": 396,
+      "min": 310,
+      "max": 404
+    },
+    {
+      "path": "face.talking",
+      "types": [
+        "array"
+      ],
+      "count": 1024,
+      "minLength": 1,
+      "maxLength": 2
+    },
+    {
+      "path": "face.talking[]",
+      "types": [
+        "object"
+      ],
+      "count": 1075
+    },
+    {
+      "path": "face.talking[].detected",
+      "types": [
+        "boolean"
+      ],
+      "count": 222,
+      "example": true
+    },
+    {
+      "path": "face.talking[].stable",
+      "types": [
+        "boolean"
+      ],
+      "count": 1075,
+      "example": true
+    },
+    {
+      "path": "face.talking[].timestamp",
+      "types": [
+        "number"
+      ],
+      "count": 1075,
+      "example": 1794388721716533,
+      "min": 1794388721716533,
+      "max": 1794388778726368
+    }
+  ],
+  "samples": [
+    {
+      "atSec": 9.344,
+      "message": {
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388721716533
+            }
+          ],
+          "talking": [
+            {
+              "stable": true,
+              "timestamp": 1794388721716533
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 9.378,
+      "message": {
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388721748399
+            }
+          ],
+          "talking": [
+            {
+              "stable": true,
+              "timestamp": 1794388721748399
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 9.414,
+      "message": {
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388721780415
+            }
+          ],
+          "talking": [
+            {
+              "stable": true,
+              "timestamp": 1794388721780415
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 19.44,
+      "message": {
+        "breathing": {
+          "upperTrace": [
+            {
+              "value": -2.003605604171753,
+              "timestamp": 1794388731749783
+            }
+          ]
+        },
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388731749783
+            }
+          ],
+          "talking": [
+            {
+              "stable": true,
+              "timestamp": 1794388731749783
+            }
+          ],
+          "landmarks": [
+            {
+              "value": [
+                {
+                  "x": 528,
+                  "y": 395
+                },
+                {
+                  "x": 524,
+                  "y": 375
+                },
+                {
+                  "x": 527,
+                  "y": 381
+                },
+                "… 475 more"
+              ],
+              "stable": true,
+              "timestamp": 1794388731796554
+            }
+          ],
+          "expression": [
+            {
+              "stable": true,
+              "timestamp": 1794388731749783,
+              "scores": [
+                {
+                  "type": "ANGRY",
+                  "confidence": 0.9027783870697021
+                },
+                {
+                  "type": "CONTEMPT",
+                  "confidence": 0.14644721150398254
+                },
+                {
+                  "type": "DISGUST",
+                  "confidence": 0.16698578000068665
+                },
+                "… 5 more"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 29.47,
+      "message": {
+        "face": {
+          "landmarks": [
+            {
+              "value": [
+                {
+                  "x": 561,
+                  "y": 395
+                },
+                {
+                  "x": 553,
+                  "y": 376
+                },
+                {
+                  "x": 555,
+                  "y": 382
+                },
+                "… 475 more"
+              ],
+              "stable": true,
+              "timestamp": 1794388741829959
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 39.475,
+      "message": {
+        "breathing": {
+          "upperTrace": [
+            {
+              "value": -0.9424958825111389,
+              "timestamp": 1794388751780331
+            }
+          ]
+        },
+        "face": {
+          "landmarks": [
+            {
+              "value": [
+                {
+                  "x": 549,
+                  "y": 389
+                },
+                {
+                  "x": 545,
+                  "y": 370
+                },
+                {
+                  "x": 545,
+                  "y": 376
+                },
+                "… 475 more"
+              ],
+              "stable": true,
+              "timestamp": 1794388751812687
+            }
+          ],
+          "expression": [
+            {
+              "stable": true,
+              "timestamp": 1794388751812687,
+              "scores": [
+                {
+                  "type": "ANGRY",
+                  "confidence": 0.281467080116272
+                },
+                {
+                  "type": "CONTEMPT",
+                  "confidence": 16.981216430664062
+                },
+                {
+                  "type": "DISGUST",
+                  "confidence": 0.31998535990715027
+                },
+                "… 5 more"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 49.484,
+      "message": {
+        "breathing": {
+          "upperTrace": [
+            {
+              "value": 3.5820202827453613,
+              "stable": true,
+              "timestamp": 1794388761813497
+            }
+          ]
+        },
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388761813497
+            }
+          ],
+          "talking": [
+            {
+              "detected": true,
+              "stable": true,
+              "timestamp": 1794388761813497
+            }
+          ],
+          "landmarks": [
+            {
+              "value": [
+                {
+                  "x": 556,
+                  "y": 369
+                },
+                {
+                  "x": 551,
+                  "y": 349
+                },
+                {
+                  "x": 551,
+                  "y": 356
+                },
+                "… 475 more"
+              ],
+              "stable": true,
+              "timestamp": 1794388761845130
+            }
+          ],
+          "expression": [
+            {
+              "stable": true,
+              "timestamp": 1794388761813497,
+              "scores": [
+                {
+                  "type": "ANGRY",
+                  "confidence": 0.06471464037895203
+                },
+                {
+                  "type": "CONTEMPT",
+                  "confidence": 0.9921451807022095
+                },
+                {
+                  "type": "DISGUST",
+                  "confidence": 0.36147448420524597
+                },
+                "… 5 more"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 59.489,
+      "message": {
+        "breathing": {
+          "upperTrace": [
+            {
+              "value": 0.09567362815141678,
+              "timestamp": 1794388771828563
+            }
+          ]
+        },
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388771749779
+            }
+          ],
+          "talking": [
+            {
+              "stable": true,
+              "timestamp": 1794388771749779
+            }
+          ],
+          "landmarks": [
+            {
+              "value": [
+                {
+                  "x": 532,
+                  "y": 388
+                },
+                {
+                  "x": 525,
+                  "y": 369
+                },
+                {
+                  "x": 528,
+                  "y": 375
+                },
+                "… 475 more"
+              ],
+              "stable": true,
+              "timestamp": 1794388771828563
+            }
+          ],
+          "expression": [
+            {
+              "stable": true,
+              "timestamp": 1794388771828563,
+              "scores": [
+                {
+                  "type": "ANGRY",
+                  "confidence": 0.4312251806259155
+                },
+                {
+                  "type": "CONTEMPT",
+                  "confidence": 12.671111106872559
+                },
+                {
+                  "type": "DISGUST",
+                  "confidence": 0.7154817581176758
+                },
+                "… 5 more"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "atSec": 74.48,
+      "message": {
+        "face": {
+          "blinking": [
+            {
+              "stable": true,
+              "timestamp": 1794388778726368
+            }
+          ],
+          "talking": [
+            {
+              "stable": true,
+              "timestamp": 1794388778726368
+            }
+          ]
+        },
+        "cardio": {
+          "pulseRate": [
+            {
+              "value": 71.84064483642578,
+              "stable": true,
+              "confidence": 78.32069396972656,
+              "timestamp": 1794388734521524
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

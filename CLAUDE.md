@@ -79,6 +79,11 @@ Rules:
 - API key: Settings → encrypted with Electron safeStorage (DPAPI) in userData/presage-key.bin; Settings key beats .env;
   window only ever sees "source + last 4 chars". .env is ignored in the installed app. Never ship a key in the app.
 - userData forced to <appData>/second-guess for dev and installed builds alike.
+- Repo presentation follows the user's guide "Hackathon 101" (Google Drive PDF), ch. 15–17 + Appendix F checklists:
+  README order = name/tagline, GIF, links, problem, solution, screenshots, features (honest), signals, results (honest),
+  challenges, consent, tech stack, download, run locally, judging criteria (event's own words), what's next, team,
+  license. Evidence in docs/evidence/ (real SDK field report, check-mode results, test results). Video follows
+  problem → solution → demo → how it works → what's next, captions, < 2 min.
 - Fresh-clone check 2026-11-11: npm ci + 99 tests + build pass.
 
 ## SDK findings (M1)

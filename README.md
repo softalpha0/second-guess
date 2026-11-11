@@ -1,31 +1,37 @@
 # Second Guess
 
-**Flashcards that notice when you're guessing.**
+**Second Guess helps students find the answers they only guessed right, without trusting their own over-confident self-ratings.**
 
-You got it right — but did you *know* it? Second Guess watches for hesitation while you recall an answer, using your webcam and the [Presage SmartSpectra SDK](https://github.com/Presage-Security/SmartSpectra). When a right answer was really a guess, it brings that card back tomorrow instead of next week.
+A desktop flashcard app that watches for hesitation *while you recall* an answer — using your webcam and the [Presage SmartSpectra SDK](https://github.com/Presage-Security/SmartSpectra). When a right answer was really a guess, it says **"Right — but you hesitated"** and brings that card back tomorrow instead of next week.
 
 ![Right — but you hesitated](docs/screenshots/hesitated.gif)
 
-- **Demo video (1:27):** https://youtu.be/Bw7pHNqaJRY
-- **DEV post:** _add link_
+| | |
+|---|---|
+| 🎬 **Demo video (1:27)** | https://youtu.be/Bw7pHNqaJRY |
+| 💻 **Download (Windows)** | [Releases](https://github.com/softalpha0/second-guess/releases) — installer, see [Download](#download-windows) |
+| 📝 **DEV post** | _add link_ |
+| 🧾 **Evidence** | [docs/evidence](docs/evidence/) — SDK field report from a real run, honest accuracy results, test results |
 
-Built for the **Presage SmartSpectra SDK Challenge** on DEV.
+Built for the **Presage SmartSpectra SDK Challenge** on DEV · categories: Best Thoughtful Real-World Use, Most Creative or Delightful Use.
 
-> ⚠️ Second Guess measures study hesitation, not stress, emotion or health. It is not a medical device.
+> ⚠️ Second Guess measures study hesitation — not stress, emotion or health. It is not a medical device.
 
 ---
 
 ## The problem
 
-Flashcard apps decide when you'll see a card again from your own rating. But people overrate lucky guesses, so those cards get pushed days away and forgotten. You find out in the exam.
+Spaced-repetition apps (Anki, Quizlet, Brainscape) decide when you see a card again from **your own rating** of how well you knew it. People overrate lucky guesses. A guess gets scheduled like real knowledge, pushed a week away, and forgotten — and students find out in the exam.
 
-## How it works
+## The solution
 
-1. **Agree** to camera use. Nothing starts without consent, and nothing is recorded.
-2. **Warm up** for 60 seconds with easy cards, so Second Guess learns *your* normal pace.
-3. **Study.** See the question, think, press **Space**, mark **Right** or **Wrong**.
-4. If you were right but hesitated — a long pause, looking away, holding your breath — you'll see **"Right — but you hesitated"** and the card comes back tomorrow. Disagree? Press **H** to override.
-5. **Review** your session: which right answers were guesses, and what's coming back.
+The time between seeing a question and revealing the answer is the **recall window**. Second Guess watches it with the SmartSpectra SDK — a long pause, looking away, a held breath, a burst of blinks, a change of expression — and compares each signal with **your own 60-second warm-up**. Right but hesitant? You see the reason in plain words, and the card comes back **tomorrow**. Disagree? Press **H**.
+
+1. **Agree** to camera use — nothing starts without consent, nothing is recorded.
+2. **Camera check** with plain hints ("Move a little closer") and a face-points mirror instead of video.
+3. **Warm up** with 8 easy cards so the app learns *your* normal.
+4. **Study** with the keyboard: `Space` reveals, `→` right, `←` wrong.
+5. **Summary**: which right answers were guesses, why, and what comes back tomorrow.
 
 ## Screenshots
 
@@ -33,114 +39,147 @@ All taken from the real app on my laptop with a real webcam.
 
 | | |
 |---|---|
-| ![Right — but you hesitated](docs/screenshots/hesitated.png) **A caught guess**: right answer, but a long pause → back tomorrow | ![Live SDK signals](docs/screenshots/sdk-live-signals.png) **Live SDK signals**: breathing, blinks, expressions, 478 face points (numbers only) |
-| ![Camera check](docs/screenshots/camera-check.png) **Camera check**: plain hints and a face-points "mirror" — no video | ![Warm-up](docs/screenshots/warmup.png) **60-second warm-up** learns your normal pace |
-| ![Session summary](docs/screenshots/summary.png) **Session summary** | ![Signal replay and Check mode](docs/screenshots/signal-replay.png) **Check mode result and signal replay** |
+| ![A caught guess](docs/screenshots/hesitated.png) **A caught guess** — right, but a long pause → back tomorrow | ![Live SDK signals](docs/screenshots/sdk-live-signals.png) **Live SDK signals** — breathing, blinks, expressions, 478 face points (numbers only) |
+| ![Camera check](docs/screenshots/camera-check.png) **Camera check** — plain hints and a face-points "mirror", no video | ![Warm-up](docs/screenshots/warmup.png) **60-second warm-up** learns your normal pace |
+| ![Session summary](docs/screenshots/summary.png) **Session summary** | ![Check mode and signal replay](docs/screenshots/signal-replay.png) **Check mode result and signal replay** |
 
-## Features
-
-_Mark honestly what works in the submitted version._
+## Features (what works now)
 
 | Feature | Status |
 |---|---|
 | Consent screen + camera check with plain hints | ✅ |
-| Built-in decks + CSV and Anki import | ✅ |
+| Built-in decks (30 cards each, our own) + CSV and Anki import | ✅ |
 | Keyboard study loop | ✅ |
 | 60-second personal warm-up | ✅ |
-| Hesitation score with reasons | ✅ (weights to be tuned on real study data) |
-| Scheduling that brings guesses back sooner, with override | ✅ |
+| Hesitation score with plain reasons | ✅ — accuracy still being tuned, see [Results](#results-honest) |
+| Scheduling that brings guesses back sooner, with override (`H`) | ✅ |
 | Session summary | ✅ |
-| Works without a camera (plain flashcards) | ✅ |
+| Works without a camera or key (plain flashcards) | ✅ |
 | Check mode: measures how often it agrees with you | ✅ |
 | Signal replay for a card | ✅ |
-| Progress over days (lucky guesses that became sure) | ✅ |
-| Settings: threshold, signals, camera, delete all data | ✅ |
+| Progress over days, CSV export, light/dark theme, shortcut overlay (`?`) | ✅ |
+| Settings: threshold, signals on/off, camera, API key, delete all data | ✅ |
+| Windows installer | ✅ build config (`npm run dist`) |
 
-## Check mode: how often does it agree with you?
+## How it responds to human signals (use of the technology)
 
-Only you know whether a right answer was a guess. In **Check mode** (Settings), Second Guess asks "Was that a guess?" after each right answer, hides its own verdict, and then reports how often the two agreed.
+Every signal is compared with **your own warm-up**, never a fixed number.
 
-> In **[N]** right answers of my own study, Second Guess agreed with me on **[X]%** — caught [a] of [b] guesses, [c] false alarms.
-> _(fill in from Settings → Check mode, or `npm run tune`)_
+| Signal | SDK source | What counts as hesitation | Weight |
+|---|---|---|---|
+| Long pause | app timing | Much slower than your pace on this deck (long questions get a reading allowance) | 55 |
+| Looking away | `face.landmarks` (478 points incl. irises) → head + eye direction | Away from your usual direction for > ~1 s | 30 |
+| Breath hold | `breathing.upperTrace` | Trace nearly flat for 2–4 s | 20 |
+| Blinking | `face.blinking` | A burst, or none when some were expected | 15 |
+| Expression | `face.expression` (8 scores) | Moving away from your resting face | 15 |
+| Pulse | `cardio.pulseRate` | Not used per card: it updated ~2×/minute on a laptop webcam | 0 |
 
-## How it responds to human signals
+The weighted sum is a 0–100 score (threshold 50, adjustable). The two biggest contributors become the reasons you see. **If the camera view is poor, the card isn't judged** ("no reading") and is scheduled normally.
 
-| Signal | What it looks for |
-|---|---|
-| Recall time | Much longer than your warm-up pace |
-| Looking away | Eyes or head off-screen while recalling |
-| Blinking | A burst of blinks, or none at all, compared with your normal |
-| Breathing | Holding your breath while recalling |
-| Expression | A change from your neutral face |
-| Pulse | A rise against your session average (lowest weight; pulse is slow and noisy) |
+```mermaid
+flowchart LR
+  CAM[Webcam] --> SDK["SmartSpectra SDK<br/>(Electron main process)"]
+  SDK -->|"~20 msgs/s: landmarks, blinks,<br/>breathing, expressions"| BUF["Signal buffer<br/>(numbers only, 5 min)"]
+  UI["Study screen"] -->|"card shown → Space"| WIN["Recall window"]
+  BUF --> WIN
+  WIN --> SCORE["Hesitation score<br/>vs your warm-up"]
+  SCORE --> VERDICT["Right — you knew it /<br/>Right — but you hesitated"]
+  VERDICT --> SCHED["Scheduler<br/>sure: 3→7→16 days · hesitated: tomorrow"]
+  SCHED --> JSON[("Local JSON files")]
+```
 
-Every signal is compared with your own warm-up, never a fixed number. Signals are combined into a 0–100 score (threshold 50, adjustable in Settings); the two biggest contributors become the reasons you see. Long questions get a reading allowance. If the camera signal is poor, the card isn't judged ("no reading").
+## Results (honest)
 
-Pulse is measured by the SDK but has **weight 0**: on a laptop webcam it updated only about twice a minute — too rarely to say anything about one 3-second recall.
+In **Check mode** the app asks "Was that a guess?" after each right answer, hides its own verdict, and compares.
+
+> In a first test of **16 right answers** of my own study, Second Guess **caught all 5 of my guesses** at the default threshold — but it also flagged **8 of the 11 answers I actually knew**, so it agreed with me about **half** the time.
+
+That's a cautious trade-off for now — a false alarm costs one extra review tomorrow, a missed guess costs you in the exam — but it's not good enough yet, and I'm saying so. Full numbers and what changed because of them: [docs/evidence/check-mode-results.md](docs/evidence/check-mode-results.md). Run `npm run tune` to measure it on yourself.
+
+## Challenges
+
+- **Pulse was too slow for one card.** The M1 spike logged every field the SDK sends: pulse arrived twice in 77 seconds, so it got weight 0 instead of a fake signal.
+- **The warm-up was too easy.** "2 + 2" takes a second; real cards take longer even when known, so every answer looked like a long pause (Check mode showed 48 points on known cards). Recall time is now compared with your pace on the real deck.
+- **Looking away pointed the wrong way** for me — I glance at the keyboard when I'm *sure*. Check mode caught this; it's the next signal to re-tune.
+- **The SDK needs the internet while running.** A network drop stops the camera; the app now says exactly why and offers "Turn camera back on" instead of failing silently.
 
 ## Consent and data handling
 
-- The camera starts only after you agree, with a visible **Camera on** indicator and a **Stop camera** button.
-- **No video, frames or images are stored or sent by Second Guess.** For each card it keeps only the hesitation score, the reasons and your recall time.
-- The SmartSpectra SDK processes the camera on this computer. It connects to Presage's servers to check the API key and download its models; those requests are linked to the API key, so they aren't anonymous.
-- **SDK telemetry is turned off** (`enableTelemetry: false`). Per Presage's [Telemetry & Privacy](https://github.com/Presage-Security/SmartSpectra/blob/main/docs/telemetry-and-privacy.md) page, that stops the session summaries and readiness reports; even when on, they never contain video frames or measured values.
-- The app never subscribes to the SDK's video output, so no frame ever reaches Second Guess's own code.
-- Study data stays in local files on your computer. **Settings → Delete all data** removes it.
-- No AI services are used.
+- The camera starts only after a consent screen; a **Camera on** indicator and **Stop camera** button are always visible.
+- **No video, frames or images are stored or sent by Second Guess.** The app never subscribes to the SDK's video output. Per card it keeps only the hesitation score, the reasons and the recall time.
+- The SmartSpectra SDK processes the camera on this computer and connects to Presage's servers to check the API key and download its models (requests are linked to the key, so not anonymous). **SDK telemetry is turned off** (`enableTelemetry: false`); per Presage's [Telemetry & Privacy](https://github.com/Presage-Security/SmartSpectra/blob/main/docs/telemetry-and-privacy.md) page, telemetry never includes frames or measured values anyway.
+- Study data stays in local files (`%APPDATA%\second-guess`). **Settings → Delete all data** removes it, including the saved API key.
+- No AI services are used by the app. No health claims.
+
+## Tech stack
+
+| Part | Choice | Why |
+|---|---|---|
+| App | **Electron + TypeScript**, Vite for the window | Presage's official Electron path; desktop webcam access |
+| Signals | **@smartspectra/node-sdk 3.5** in the main process, native camera 1280×720@30 | Camera keeps running even if the window is busy; key never reaches the window |
+| Logic | Pure functions in `src/core` (hesitation, scheduler, baseline, signals, import) | Unit-tested with **Vitest** (104 tests) |
+| Storage | Local JSON files; API key encrypted with Electron safeStorage (Windows DPAPI) | No database, no cloud |
+| Charts / replay | Hand-written SVG | No chart library needed |
+| Installer | electron-builder (NSIS) | One-file Windows download |
+
+```
+src/core/      hesitation.ts · scheduler.ts · baseline.ts · signals.ts · deck-import.ts · summary.ts …  (pure, tested)
+src/main/      main.ts · sdk.ts (SDK session) · store.ts (JSON) · keystore.ts (encrypted key)
+src/renderer/  screens: decks · consent · camera-check · warmup · study · summary · progress · settings
+decks/         capitals.csv · spanish.csv · webdev.csv
+test/          Vitest tests for src/core and storage
+docs/          evidence/ · screenshots/ · video/ · dev-post.md
+```
 
 ## Download (Windows)
 
 1. Download **`Second-Guess-Setup-1.0.0.exe`** from the [Releases page](https://github.com/softalpha0/second-guess/releases).
-2. Run it. Windows may show **"Windows protected your PC"** because this hackathon app isn't code-signed: click **More info → Run anyway**.
-3. Open Second Guess → **Settings → Presage API key**: create a free key at [physiology.presagetech.com](https://physiology.presagetech.com/) and paste it. It's stored encrypted on your computer (Windows DPAPI).
-4. Pick a deck and study. No key or no webcam? It still works as plain flashcards.
+2. Run it. Windows may show **"Windows protected your PC"** because this hackathon app isn't code-signed: **More info → Run anyway**.
+3. **Settings → Presage API key**: create a free key at [physiology.presagetech.com](https://physiology.presagetech.com/) and paste it (stored encrypted on your computer).
+4. Pick a deck and study. No key or webcam? It still works as plain flashcards.
 
-Needs Windows 10/11 (64-bit), a webcam and an internet connection (the SDK checks the key and downloads its models). The installer is large (~150 MB) because it includes Electron and the SmartSpectra runtime.
+Needs Windows 10/11 (64-bit), a webcam and an internet connection.
 
-## Run from source
+## Run it locally
 
-Requires Node.js 22 (or newer), a webcam and a Presage API key (in `.env` or in Settings).
+Requires Node.js 22+, a webcam and a Presage API key.
 
 ```bash
 git clone https://github.com/softalpha0/second-guess.git
 cd second-guess
 npm install
-cp .env.example .env   # add SMARTSPECTRA_API_KEY
+cp .env.example .env   # add SMARTSPECTRA_API_KEY (or paste the key in Settings later)
 npm start
 ```
 
-No key or camera? It still runs as plain flashcards.
-
-Other commands:
+`.env.example` lists the variables: `SMARTSPECTRA_API_KEY` (required for the camera), `SMARTSPECTRA_CAPI_PATH` (optional, only for unusual install paths).
 
 | Command | What it does |
 |---|---|
-| `npm test` | Runs the automatic tests (scoring, scheduling, import, …) |
-| `npm run probe` | Checks the SDK without opening a window (45 s), writes a field report to `sdk-reports/` |
+| `npm test` | Runs the automated tests |
+| `npm run probe` | Checks the SDK without a window (45 s) and writes a field report to `sdk-reports/` |
 | `npm run tune` | Shows how well each threshold matched your Check-mode answers |
 | `npm run dist` | Builds the Windows installer into `release/` (run on Windows) |
 
-## Keyboard
+**Keys:** `Space` reveal / next · `→` / `←` right / wrong · `H` change the verdict · `Y` / `N` Check mode · `?` all shortcuts.
 
-| Key | Does |
+## How it fits the judging criteria
+
+| Criterion | Where to see it |
 |---|---|
-| `Space` | Show the answer (ends the recall window) / next card |
-| `→` / `←` | I was right / I was wrong |
-| `H` | Change the verdict ("No, I knew it" / "Actually, I guessed") |
-| `Y` / `N` | Check mode: was that a guess? |
-| `?` | All shortcuts for the current screen |
+| **Use of the technology** | Five SDK signals (landmarks incl. irises, blinking, breathing trace, expressions, validation status) turned into a per-card score against a personal baseline; SDK validation codes become plain camera hints; an M1 spike logged every SDK field on real hardware ([evidence](docs/evidence/)) |
+| **Usability & UX** | Keyboard-only study, plain-language reasons, one-key override, "no reading" instead of guessing when the view is poor, no-camera mode, light/dark theme |
+| **Originality & creativity** | Physiological signals used not for health but to catch a lucky guess and fix spaced-repetition scheduling; Check mode measures its own accuracy honestly |
 
-## How it's built
+## What's next
 
-- **Electron + TypeScript + Vite**, `@smartspectra/node-sdk` 3.5 in the main process with the native camera (1280×720, 30 fps). Metrics are decoded there and turned into numbers per frame: blink flags, head/eye direction from the 478-point face mesh (incl. iris), the chest-breathing trace and expression scores.
-- When you press Space, the window asks for the signals between "card shown" and "Space"; `src/core/hesitation.ts` scores them against your warm-up baseline.
-- All scoring, scheduling, import and summary logic is pure functions in `src/core` with Vitest tests.
-- Data: small JSON files in your user-data folder (`%APPDATA%\second-guess` on Windows).
-- Built with Claude Code.
+- Re-tune with more Check-mode data: lower "looking away" (it points the wrong way for some users) and learn each user's weights from their own Y/N answers.
+- A longer, varied warm-up so the personal baseline matches real cards from the first card.
+- Import/export to Anki so the "hesitated" verdicts can feed an existing deck.
 
 ## Team
 
-[softalpha0](https://github.com/softalpha0) — solo
+[softalpha0](https://github.com/softalpha0) — solo. Built during the challenge with Claude Code (AI coding assistant) from a written PRD; every feature was tested on my own laptop and webcam.
 
 ## License
 
