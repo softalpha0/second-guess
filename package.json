@@ -1,0 +1,30 @@
+{
+  "name": "second-guess",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flashcards that notice when you're guessing.",
+  "license": "MIT",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build:main": "esbuild src/main/main.ts src/main/preload.ts --bundle --platform=node --format=cjs --target=node22 --outdir=dist/main --external:electron --external:@smartspectra/node-sdk --log-level=warning",
+    "build:probe": "esbuild src/probe/probe.ts --bundle --platform=node --format=cjs --target=node22 --outfile=dist/probe/probe.js --external:@smartspectra/node-sdk --log-level=warning",
+    "build:renderer": "vite build --logLevel warn",
+    "build": "npm run build:main && npm run build:renderer",
+    "start": "npm run build && electron .",
+    "probe": "npm run build:probe && node dist/probe/probe.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@smartspectra/node-sdk": "^3.5.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "electron": "^43.8.1",
+    "esbuild": "^0.25.12",
+    "typescript": "5.9",
+    "vite": "^7.3.8",
+    "vitest": "^5.1.0"
+  }
+}
