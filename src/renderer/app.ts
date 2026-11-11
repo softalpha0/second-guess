@@ -77,6 +77,12 @@ export const session = {
   lastAgreement: null as Agreement | null,
 };
 
+/** Apply the colour theme ('system' follows Windows' light/dark setting). */
+export function applyTheme(theme: 'system' | 'dark' | 'light'): void {
+  const light = theme === 'light' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
+  document.documentElement.dataset.theme = light ? 'light' : 'dark';
+}
+
 /** Top-of-window banner (e.g. "Camera off — plain flashcards"), with an optional button. */
 export function setBanner(text: string | null, action?: { label: string; run: () => void }): void {
   const el = document.getElementById('banner')!;

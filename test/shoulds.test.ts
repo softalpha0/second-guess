@@ -73,3 +73,18 @@ describe('S2 replay tracks', () => {
     expect(replayTracks(s, { ...b, signals: null }, 1000)).toBeNull();
   });
 });
+
+import { csvField, toCsv } from '../src/core/export-csv';
+describe('CSV export', () => {
+  it('quotes commas and quotes, and blocks formulas', () => {
+    expect(csvField('Paris, France')).toBe('"Paris, France"');
+    expect(csvField('say "hi"')).toBe('"say ""hi"""');
+    expect(csvField('=SUM(A1)')).toBe("'=SUM(A1)");
+  });
+  it('writes a header and one row per answer', () => {
+    const csv = toCsv([{ at: '2026-11-16T10:00:00Z', deck: 'Caps', front: 'Capital of Peru?', back: 'Lima', correct: true, verdict: 'hesitated', score: 62, reasons: ['long pause', 'looked away'], recallMs: 4210, signal: 'good' }]);
+    const [head, row] = csv.trim().split('\r\n');
+    expect(head.startsWith('date,deck,front,back,correct')).toBe(true);
+    expect(row).toBe('2026-11-16T10:00:00Z,Caps,Capital of Peru?,Lima,yes,hesitated,62,long pause; looked away,4.21,,,good');
+  });
+});

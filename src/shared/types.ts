@@ -41,6 +41,8 @@ export interface Settings {
   signals: Record<SignalKey, boolean>;
   /** S1: ask "Was that a guess?" instead of showing the verdict. */
   checkMode: boolean;
+  /** Could: colour theme. */
+  theme: 'system' | 'dark' | 'light';
 }
 
 export interface Deck {
@@ -123,4 +125,6 @@ export interface SgApi {
   getReviews(): Promise<Review[]>;
   /** S4: delete settings, imported decks, history, schedule and logs. */
   deleteAllData(): Promise<void>;
+  /** Could: save all answers as a CSV file (asks where). Returns the path, or null if cancelled. */
+  exportCsv(): Promise<string | null>;
 }

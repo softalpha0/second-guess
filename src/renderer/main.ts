@@ -1,7 +1,8 @@
 // Window entry: header (camera indicator + Stop camera), simple screen router,
 // and keyboard routing to the active screen.
 
-import { camera, session, setBanner } from './app';
+import { applyTheme, camera, session, setBanner } from './app';
+import { shortcutsFor, toggleShortcuts } from './shortcuts';
 import type { SgApi } from '../shared/types';
 import { decksScreen } from './screens/decks';
 import { consentScreen } from './screens/consent';
@@ -41,6 +42,7 @@ const screens: Record<ScreenName, Screen> = {
 
 const view = document.getElementById('view')!;
 let active: ScreenHandle | void;
+let activeName: ScreenName = 'decks';
 let navToken = 0;
 
 export const go: Go = (name, params = {}) => {
@@ -49,6 +51,9 @@ export const go: Go = (name, params = {}) => {
   view.replaceChildren();
   view.scrollTop = 0;
   const token = ++navToken;
+  activeName = name;
+  // A clicked header button keeps focus; Enter would "click" it again instead of reaching the screen.
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
   Promise.resolve(screens[name](view, go, params)).then((handle) => {
     if (token === navToken) active = handle;
     else handle?.dispose?.(); // user navigated away while it was loading
@@ -56,6 +61,12 @@ export const go: Go = (name, params = {}) => {
 };
 
 window.addEventListener('keydown', (e) => {
+  if (e.key === '?' || (e.key === 'Escape' && document.getElementById('shortcuts'))) {
+    e.preventDefault();
+    toggleShortcuts(shortcutsFor(activeName));
+    return;
+  }
+  if (document.getElementById('shortcuts')) return; // overlay open: ignore other keys
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement) {
     if (e.key !== 'Escape') return;
   }
@@ -93,4 +104,8 @@ camera.subscribe((s) => {
 // Handy for automated UI checks; harmless otherwise.
 (window as unknown as { __sgGo: Go }).__sgGo = go;
 
+void window.sg.getSettings().then((s) => {
+  applyTheme(s.theme);
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => void window.sg.getSettings().then((x) => applyTheme(x.theme)));
+});
 void camera.init().then(() => go('decks'));

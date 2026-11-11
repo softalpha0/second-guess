@@ -3,7 +3,7 @@
 import type { Screen } from '../main';
 import type { Settings } from '../../shared/types';
 import { h, kbd } from '../ui';
-import { session, setBanner } from '../app';
+import { applyTheme, session, setBanner } from '../app';
 import { DEFAULT_THRESHOLD, DEFAULT_WEIGHTS, type SignalKey } from '../../core/hesitation';
 import { agreement, agreementText } from '../../core/check-mode';
 
@@ -62,6 +62,20 @@ export const settingsScreen: Screen = async (root, go) => {
   const checked = reviews.filter((r) => r.checkMode && r.selfGuess !== undefined && (r.verdict === 'sure' || r.verdict === 'hesitated'));
   const agree = agreement(checked.map((r) => ({ appHesitated: r.verdict === 'hesitated', selfGuess: !!r.selfGuess })));
 
+  function themeSelect(): HTMLElement {
+    const sel = h('select', {},
+      h('option', { value: 'system' }, 'Same as Windows'),
+      h('option', { value: 'dark' }, 'Dark'),
+      h('option', { value: 'light' }, 'Light')) as HTMLSelectElement;
+    sel.value = s.theme;
+    sel.addEventListener('change', () => {
+      const theme = sel.value as Settings['theme'];
+      applyTheme(theme);
+      void save({ theme });
+    });
+    return h('label.small', {}, sel);
+  }
+
   async function deleteAll(): Promise<void> {
     if (!confirm('Delete all Second Guess data on this computer?\n\nThis removes your study history, schedule, imported decks, settings and logs. It cannot be undone.')) return;
     await window.sg.deleteAllData();
@@ -97,6 +111,9 @@ export const settingsScreen: Screen = async (root, go) => {
           h('span.small.muted', {}, 'Second Guess hides its own verdict and later shows how often it agreed with you. Your answer decides the schedule.'))),
       h('p.small', {}, agreementText(agree),
         agree.total ? h('span.muted', {}, `  (caught ${agree.caught} of ${agree.caught + agree.missed} guesses · ${agree.falseAlarms} false alarm${agree.falseAlarms === 1 ? '' : 's'})`) : null),
+
+      h('h2', {}, 'Theme'),
+      themeSelect(),
 
       h('h2', {}, 'Your data'),
       h('p.small.muted', {}, 'Everything is stored only on this computer. No video, frames or images are ever stored.'),

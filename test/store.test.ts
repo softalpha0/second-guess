@@ -65,6 +65,15 @@ describe('store', () => {
     expect(Object.keys(s.getSchedule('builtin:spanish'))).toHaveLength(0);
   });
 
+  it('exports answers as CSV with deck names and card text', () => {
+    const dir = tmp();
+    const s = new Store(dir, join(__dirname, '..', 'decks'));
+    const deck = s.getDeck('builtin:spanish')!;
+    s.addReviews([{ deckId: deck.id, cardId: deck.cards[0].id, at: '2026-11-16T10:00:00Z', recallMs: 1500, correct: true, signal: 'good', verdict: 'sure', score: 5 }]);
+    const csv = s.exportCsv();
+    expect(csv).toContain('Spanish basics,hello,hola,yes,sure,5');
+  });
+
   it('delete all removes settings, imported decks and reviews', () => {
     const dir = tmp();
     const s = new Store(dir, dir);

@@ -22,6 +22,7 @@ const api: SgApi = {
   saveCardStates: (states) => ipcRenderer.invoke('store:save-card-states', states),
   getReviews: () => ipcRenderer.invoke('store:get-reviews'),
   deleteAllData: () => ipcRenderer.invoke('store:delete-all'),
+  exportCsv: () => ipcRenderer.invoke('store:export-csv'),
   onEvent: (cb) => {
     const listener = (_e: IpcRendererEvent, ev: SdkEvent) => cb(ev);
     ipcRenderer.on('sdk:event', listener);

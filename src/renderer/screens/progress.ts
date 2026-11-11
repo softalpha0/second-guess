@@ -45,6 +45,7 @@ export const progressScreen: Screen = async (root, go) => {
     svg.append(label);
   });
 
+  const exportMsg = h('p.small.muted');
   const checked = reviews.filter((r) => r.checkMode && r.selfGuess !== undefined && (r.verdict === 'sure' || r.verdict === 'hesitated'));
   const agree = agreement(checked.map((r) => ({ appHesitated: r.verdict === 'hesitated', selfGuess: !!r.selfGuess })));
 
@@ -63,7 +64,14 @@ export const progressScreen: Screen = async (root, go) => {
         h('span', {}, h('i.sw.unjudged'), 'right, not checked'), h('span', {}, h('i.sw.wrong'), 'wrong')),
       h('h2', {}, 'Check mode'),
       h('p', {}, agreementText(agree)),
-      h('div.row', {}, h('button.btn', { onclick: () => go('decks') }, 'Back')),
+      h('div.row', {},
+        h('button.btn', { onclick: () => go('decks') }, 'Back'),
+        h('button.btn', { onclick: async () => {
+          const file = await window.sg.exportCsv();
+          if (file) exportMsg.textContent = `Saved: ${file}`;
+        } }, 'Export progress (CSV)'),
+      ),
+      exportMsg,
       h('p.keys', {}, kbd('Esc'), ' back'),
     ),
   );

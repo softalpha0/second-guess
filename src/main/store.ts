@@ -10,6 +10,7 @@ import { hashText, importCsv, importDeckFile, type Card } from '../core/deck-imp
 import type { DeckSummary, Deck, Review, Settings, ImportOutcome } from '../shared/types';
 import { cardKey, deckProgress, toDay, type CardState } from '../core/scheduler';
 import { DEFAULT_ENABLED, DEFAULT_THRESHOLD } from '../core/hesitation';
+import { toCsv } from '../core/export-csv';
 
 const BUILTIN_NAMES: Record<string, string> = {
   capitals: 'World capitals',
@@ -51,6 +52,7 @@ export class Store {
       cameraId: null,
       threshold: DEFAULT_THRESHOLD,
       checkMode: false,
+      theme: 'system' as const,
       ...saved,
       signals: { ...DEFAULT_ENABLED, ...(saved.signals ?? {}) },
     };
@@ -144,6 +146,21 @@ export class Store {
 
   getReviews(): Review[] {
     return this.read<Review[]>('reviews.json', []);
+  }
+
+  /** All answers as CSV, with deck names and card text filled in. */
+  exportCsv(): string {
+    const decks = new Map([...this.builtinDecks(), ...this.importedDecks()].map((d) => [d.id, d]));
+    const rows = this.getReviews().map((r) => {
+      const d = decks.get(r.deckId);
+      const c = d?.cards.find((x) => x.id === r.cardId);
+      return {
+        at: r.at, deck: d?.name ?? r.deckId, front: c?.front ?? '(deleted card)', back: c?.back ?? '',
+        correct: r.correct, verdict: r.verdict, score: r.score, reasons: r.reasons, recallMs: r.recallMs,
+        overridden: r.overridden, selfGuess: r.selfGuess, signal: r.signal,
+      };
+    });
+    return '\uFEFF' + toCsv(rows); // BOM so Excel reads accents (é, ñ) correctly
   }
 
   /** Settings → Delete all data (used from S4; available now for testing). */

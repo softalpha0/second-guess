@@ -2,7 +2,7 @@
 // and answers the window's requests over IPC.
 import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
 import { join } from 'node:path';
-import { appendFileSync, mkdirSync, rmSync } from 'node:fs';
+import { appendFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { config as loadEnv } from 'dotenv';
 import { SdkSession } from './sdk';
 import { writeReport } from './report';
@@ -87,6 +87,16 @@ ipcMain.handle('store:delete-deck', (_e, id: string) => store.deleteDeck(id));
 ipcMain.handle('store:add-reviews', (_e, reviews: Review[]) => store.addReviews(reviews));
 ipcMain.handle('store:get-schedule', (_e, deckId: string) => store.getSchedule(deckId));
 ipcMain.handle('store:get-reviews', () => store.getReviews());
+ipcMain.handle('store:export-csv', async () => {
+  const res = await dialog.showSaveDialog(win!, {
+    title: 'Export progress',
+    defaultPath: join(app.getPath('documents'), `second-guess-progress-${new Date().toISOString().slice(0, 10)}.csv`),
+    filters: [{ name: 'CSV', extensions: ['csv'] }],
+  });
+  if (res.canceled || !res.filePath) return null;
+  writeFileSync(res.filePath, store.exportCsv(), 'utf8');
+  return res.filePath;
+});
 ipcMain.handle('store:delete-all', async () => {
   await sdk.stop('internal');
   store.deleteAll();
