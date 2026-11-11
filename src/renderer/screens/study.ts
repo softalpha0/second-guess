@@ -10,7 +10,7 @@ import { h, kbd } from '../ui';
 import { camera, session } from '../app';
 import { flashcard } from '../flashcard';
 import { StudySession, type CardResult } from '../../core/study-session';
-import { scoreHesitation, verdictText, weightsFor, type HesitationResult, type Verdict } from '../../core/hesitation';
+import { readingAdjustedRecall, scoreHesitation, verdictText, weightsFor, type HesitationResult, type Verdict } from '../../core/hesitation';
 import { replayTracks } from '../../core/replay';
 import { agreement } from '../../core/check-mode';
 import { addDays, cardKey, pickSession, schedule, toDay, type CardState, type Outcome } from '../../core/scheduler';
@@ -72,6 +72,8 @@ export const studyScreen: Screen = async (root, go, params) => {
   const failedThisSession = new Set<string>();
   const retriesLeft = new Map<string, number>();
   const attempts: Attempt[] = [];
+  /** Reading-adjusted recall times of right first answers so far: the deck pace. */
+  const sessionRecalls: number[] = [];
   const answered: Answered[] = [];
   let pending: Pending | null = null;
   let busy = false; // waiting for signals after an answer
@@ -142,7 +144,11 @@ export const studyScreen: Screen = async (root, go, params) => {
       weights,
       threshold: settings.threshold,
       frontLength: result.card.front.length,
+      sessionRecalls,
     });
+    if (correct && !failedThisSession.has(result.card.id) && session.baseline) {
+      sessionRecalls.push(readingAdjustedRecall(result.recallMs, result.card.front.length, session.baseline));
+    }
     const a: Answered = { result, retry: failedThisSession.has(result.card.id), signal, hesitation, verdict: hesitation.verdict, overridden: false, signals };
 
     if (!correct) return commit(a); // wrong: no check, move straight on

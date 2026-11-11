@@ -68,6 +68,10 @@ Rules:
   all colours are CSS variables, light overrides at :root[data-theme=light]).
 - `npm run tune [reviews.json]`: agreement per threshold + per-signal separation from Check-mode reviews (Nov 19).
 - Submission drafts: docs/dev-post.md (fill [BRACKETS], real agreement number only), docs/demo-script.md.
+- Tuning round 1 (10 Check-mode answers, 3 guesses): agreement 50%, 5 false alarms; "long pause" gave 47.8 pts avg
+  to KNOWN cards (warm-up "2+2" pace too fast vs real cards). Fix: recall reference = max(1.5× warm-up median,
+  median of this session's reading-adjusted right first answers once ≥4). blink/breath/expression gave 0 on all 10.
+  Old reviews keep their old scores (raw signals aren't stored), so judge the fix on NEW Check-mode answers.
 - Fresh-clone check 2026-11-11: npm ci + 99 tests + build pass.
 
 ## SDK findings (M1)

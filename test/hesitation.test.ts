@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   blinkStrength, breathStrength, expressionStrength, lookAwayStrength, recallStrength,
-  scoreHesitation, verdictText, weightsFor,
+  scoreHesitation, verdictText, weightsFor, recallReference,
 } from '../src/core/hesitation';
 import type { Baseline } from '../src/core/baseline';
 import type { RecallSignals } from '../src/core/signals';
@@ -116,7 +116,7 @@ describe('hesitation score', () => {
   });
 
   it('a very long pause alone is enough', () => {
-    const r = scoreHesitation({ correct: true, recallMs: 5000, signals: calm(5000), baseline });
+    const r = scoreHesitation({ correct: true, recallMs: 7000, signals: calm(7000), baseline });
     expect(r.verdict).toBe('hesitated');
     expect(r.reasons[0]).toBe('long pause');
   });
@@ -141,8 +141,26 @@ describe('hesitation score', () => {
     // 4 s on a 16-char question is a long pause; on a 76-char question 2.1 s of it is reading
     const short = scoreHesitation({ correct: true, recallMs: 4000, signals: calm(4000), baseline, frontLength: 16 });
     const long = scoreHesitation({ correct: true, recallMs: 4000, signals: calm(4000), baseline, frontLength: 76 });
-    expect(short.parts.recall).toBe(55);
-    expect(long.parts.recall!).toBeLessThan(20);
+    expect(short.parts.recall!).toBeGreaterThan(30);
+    expect(long.parts.recall!).toBeLessThan(10);
+  });
+
+  it('compares with your pace on the real deck once a few answers exist', () => {
+    // known cards on this deck take ~3 s: a 3.2 s answer is normal, not a long pause
+    const sessionRecalls = [2800, 3000, 3100, 2900, 3300];
+    const withPace = scoreHesitation({ correct: true, recallMs: 3200, signals: calm(3200), baseline, sessionRecalls });
+    const warmOnly = scoreHesitation({ correct: true, recallMs: 3200, signals: calm(3200), baseline });
+    expect(withPace.parts.recall).toBe(0);
+    expect(warmOnly.parts.recall!).toBeGreaterThan(withPace.parts.recall!);
+    // a real stall (4× the deck pace) still counts fully
+    expect(scoreHesitation({ correct: true, recallMs: 12500, signals: calm(12500), baseline, sessionRecalls }).parts.recall).toBe(55);
+  });
+
+  it('uses 1.5× the warm-up pace until there are enough answers', () => {
+    expect(recallReference(baseline, [])).toBe(1500);
+    expect(recallReference(baseline, [5000, 5000, 5000])).toBe(1500);
+    expect(recallReference(baseline, [5000, 5000, 5000, 5000])).toBe(5000);
+    expect(recallReference(baseline, [500, 500, 500, 500])).toBe(1500); // never faster than 1.5× warm-up
   });
 
   it('switched-off signals are ignored', () => {
@@ -155,7 +173,7 @@ describe('hesitation score', () => {
 
   it('threshold is adjustable', () => {
     const s = calm(2500);
-    const low = scoreHesitation({ correct: true, recallMs: 2500, signals: s, baseline, threshold: 10 });
+    const low = scoreHesitation({ correct: true, recallMs: 2500, signals: s, baseline, threshold: 5 });
     expect(low.verdict).toBe('hesitated');
   });
 

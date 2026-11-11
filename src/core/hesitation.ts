@@ -11,6 +11,7 @@
 
 import type { Baseline } from './baseline';
 import type { RecallSignals } from './signals';
+import { median } from './stats';
 
 export type SignalKey = 'recall' | 'lookAway' | 'blink' | 'breath' | 'expression' | 'pulse';
 
@@ -44,6 +45,23 @@ export function weightsFor(enabled: Partial<Record<SignalKey, boolean>>): Record
  * many ms (≈ a comfortable reading speed).
  */
 export const READ_MS_PER_CHAR = 35;
+
+/**
+ * The pace a recall is compared with. The warm-up cards are trivial ("2 + 2"),
+ * so real cards take longer even when known (first real data: "long pause" gave
+ * 48 points on average to cards the student knew). So: at least 1.5× the
+ * warm-up pace, and — once a few right answers exist in this session — the
+ * median of those (reading-adjusted), whichever is slower. The median ignores
+ * the occasional guess as long as most answers are known.
+ */
+export const WARMUP_FACTOR = 1.5;
+export const MIN_SESSION_ANSWERS = 4;
+
+export function recallReference(baseline: Baseline, sessionRecalls: number[] = []): number {
+  const warm = baseline.recallMedianMs * WARMUP_FACTOR;
+  if (sessionRecalls.length < MIN_SESSION_ANSWERS) return warm;
+  return Math.max(warm, median(sessionRecalls) ?? warm);
+}
 
 export function readingAdjustedRecall(recallMs: number, frontLength: number | undefined, baseline: Baseline): number {
   if (frontLength === undefined) return recallMs;
@@ -165,6 +183,8 @@ export interface ScoreInput {
   threshold?: number;
   /** Question length in characters (reading allowance). */
   frontLength?: number;
+  /** Reading-adjusted recall times of earlier RIGHT answers in this session. */
+  sessionRecalls?: number[];
 }
 
 export function scoreHesitation(input: ScoreInput): HesitationResult {
@@ -183,7 +203,7 @@ export function scoreHesitation(input: ScoreInput): HesitationResult {
     candidates.push({ key, points: w[key] * strength, reason });
 
   const adjusted = readingAdjustedRecall(recallMs, input.frontLength, baseline);
-  add('recall', recallStrength(adjusted, baseline.recallMedianMs), 'long pause');
+  add('recall', recallStrength(adjusted, recallReference(baseline, input.sessionRecalls)), 'long pause');
   add('lookAway', lookAwayStrength(signals, b).strength, 'looked away');
   const blink = blinkStrength(signals, b);
   add('blink', blink.strength, blink.kind === 'none' ? 'stopped blinking' : 'blinked a lot');
