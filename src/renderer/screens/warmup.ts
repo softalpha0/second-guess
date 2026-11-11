@@ -64,7 +64,7 @@ export const warmupScreen: Screen = (root, go, params) => {
           ? h('p.notice.error', {}, 'Try the warm-up again with your face and shoulders in view, so hesitation can be checked.')
           : null,
         h('div.row', {},
-          h('button.btn.primary', { onclick: () => go('study', params) }, 'Start studying'),
+          h('button.btn.primary', { onclick: () => go(params.deckId ? 'study' : 'decks', params) }, 'Start studying'),
           h('button.btn', { onclick: begin }, 'Redo warm-up'),
         ),
         h('p.keys', {}, kbd('Enter'), ' start studying   ', kbd('R'), ' redo warm-up'),
@@ -78,7 +78,7 @@ export const warmupScreen: Screen = (root, go, params) => {
     onKey(e) {
       if (e.repeat) return;
       if (finished) {
-        if (e.key === 'Enter') go('study', params);
+        if (e.key === 'Enter') go(params.deckId ? 'study' : 'decks', params);
         else if (e.key.toLowerCase() === 'r') begin();
         else if (e.key === 'Escape') go('decks');
         return;

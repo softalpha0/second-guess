@@ -282,7 +282,7 @@ async function start(): Promise<void> {
 
 async function stop(): Promise<void> {
   el.stop.disabled = true;
-  await window.sg.stop();
+  await window.sg.stop('user');
 }
 
 el.start.addEventListener('click', () => void start());

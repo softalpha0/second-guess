@@ -43,7 +43,7 @@ export const cameraCheckScreen: Screen = async (root, go, params) => {
   select.value = info.cameras.some((c) => c.id === settings.cameraId) ? settings.cameraId ?? '' : '';
   select.addEventListener('change', async () => {
     await window.sg.updateSettings({ cameraId: select.value || null });
-    await window.sg.stop();
+    await window.sg.stop('internal');
     void startCamera();
   });
 
@@ -116,7 +116,7 @@ export const cameraCheckScreen: Screen = async (root, go, params) => {
   }
   function withoutCamera(): void {
     session.noCamera = true;
-    void window.sg.stop();
+    void window.sg.stop('internal');
     go('study', params);
   }
   startBtn.addEventListener('click', begin);

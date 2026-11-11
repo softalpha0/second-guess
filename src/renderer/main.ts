@@ -59,7 +59,7 @@ window.addEventListener('keydown', (e) => {
 // Header: camera indicator and Stop camera, visible on every screen.
 const indicator = document.getElementById('cam-indicator')!;
 const stopBtn = document.getElementById('btn-stop-camera') as HTMLButtonElement;
-stopBtn.addEventListener('click', () => void window.sg.stop());
+stopBtn.addEventListener('click', () => void window.sg.stop('user'));
 document.getElementById('brand')!.addEventListener('click', () => go('decks'));
 
 let wasOn = false;
@@ -67,9 +67,16 @@ camera.subscribe((s) => {
   indicator.textContent = s.on ? '● Camera on' : '● Camera off';
   indicator.className = `cam-indicator ${s.on ? 'on' : 'off'}`;
   stopBtn.hidden = !s.on;
-  if (wasOn && !s.on) {
+  if (wasOn && !s.on && s.offReason !== 'internal') {
     session.baseline = null;
-    setBanner('Camera stopped. You can keep studying as plain flashcards — answers won’t be checked for hesitation.');
+    const why =
+      s.offReason === 'user'
+        ? 'You stopped the camera.'
+        : `The camera stopped by itself (${(s.offReason ?? 'unknown reason').replace(/^error: /, '')}).`;
+    setBanner(`${why} You can keep studying as plain flashcards — answers won’t be checked for hesitation.`, {
+      label: 'Turn camera back on',
+      run: () => go('camera-check', session.deckId ? { deckId: session.deckId } : {}),
+    });
   }
   if (s.on) setBanner(null);
   wasOn = s.on;

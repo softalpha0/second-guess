@@ -6,7 +6,7 @@ import type { SdkEvent, SgApi } from '../shared/types';
 const api: SgApi = {
   info: () => ipcRenderer.invoke('sdk:info'),
   start: (cameraId) => ipcRenderer.invoke('sdk:start', cameraId),
-  stop: () => ipcRenderer.invoke('sdk:stop'),
+  stop: (reason) => ipcRenderer.invoke('sdk:stop', reason ?? 'internal'),
   cameraState: () => ipcRenderer.invoke('sdk:camera-state'),
   recallWindow: (fromMs, toMs) => ipcRenderer.invoke('sdk:recall-window', fromMs, toMs),
   saveReport: () => ipcRenderer.invoke('report:save'),

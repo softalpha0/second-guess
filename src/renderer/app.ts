@@ -10,12 +10,14 @@ export interface CameraStatus {
   processing: string | null;
   validation: string | null;
   lastError: string | null;
+  /** Why the camera last went off: 'user', 'internal' or 'error: …'. */
+  offReason: string | null;
 }
 
 type Listener = (s: CameraStatus) => void;
 
 class CameraStore {
-  state: CameraStatus = { on: false, processing: null, validation: null, lastError: null };
+  state: CameraStatus = { on: false, processing: null, validation: null, lastError: null, offReason: null };
   private listeners = new Set<Listener>();
 
   async init(): Promise<void> {
@@ -28,6 +30,7 @@ class CameraStore {
   private onEvent(e: SdkEvent): void {
     if (e.type === 'camera') {
       this.state.on = e.on;
+      this.state.offReason = e.on ? null : e.reason ?? null;
       if (!e.on) {
         this.state.validation = null;
         this.state.processing = null;
@@ -59,11 +62,25 @@ export const session = {
   baseline: null as Baseline | null,
   /** The student chose to study without the camera. */
   noCamera: false,
+  /** Deck being studied, so "Turn camera back on" can come back to it. */
+  deckId: null as string | null,
 };
 
-/** Top-of-window banner (e.g. "Camera off — plain flashcards"). */
-export function setBanner(text: string | null): void {
+/** Top-of-window banner (e.g. "Camera off — plain flashcards"), with an optional button. */
+export function setBanner(text: string | null, action?: { label: string; run: () => void }): void {
   const el = document.getElementById('banner')!;
-  el.textContent = text ?? '';
+  el.replaceChildren();
   el.hidden = !text;
+  if (!text) return;
+  el.append(text);
+  if (action) {
+    const b = document.createElement('button');
+    b.className = 'btn small';
+    b.textContent = action.label;
+    b.addEventListener('click', () => {
+      setBanner(null);
+      action.run();
+    });
+    el.append(' ', b);
+  }
 }

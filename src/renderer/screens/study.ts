@@ -16,6 +16,8 @@ interface Answered {
 }
 
 export const studyScreen: Screen = async (root, go, params) => {
+  if (!params.deckId) return go('decks');
+  session.deckId = params.deckId;
   const deck = await window.sg.getDeck(params.deckId);
   if (!deck) {
     root.append(h('section.page', {}, h('p.notice.error', {}, 'That deck could not be found.'), h('button.btn', { onclick: () => go('decks') }, 'Back')));

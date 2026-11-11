@@ -2,6 +2,7 @@
 // and answers the window's requests over IPC.
 import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
 import { join } from 'node:path';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { config as loadEnv } from 'dotenv';
 import { SdkSession } from './sdk';
 import { writeReport } from './report';
@@ -15,7 +16,26 @@ const reportDir = join(app.getAppPath(), 'sdk-reports');
 let win: BrowserWindow | null = null;
 let store: Store;
 
+// Camera log: start/stop (with the reason), status changes and SDK errors, so
+// "why did the camera stop?" can always be answered. Text only, no images.
+let lastLoggedValidation = '';
+function camLog(line: string): void {
+  try {
+    mkdirSync(reportDir, { recursive: true });
+    appendFileSync(join(reportDir, 'camera-log.txt'), `${new Date().toISOString()}  ${line}\n`, 'utf8');
+  } catch {
+    /* logging must never break the app */
+  }
+}
+
 const send = (e: SdkEvent) => {
+  if (e.type === 'camera') camLog(e.on ? 'camera ON' : `camera OFF (${e.reason ?? 'unknown'})`);
+  else if (e.type === 'processing') camLog(`status ${e.name}`);
+  else if (e.type === 'error') camLog(`SDK error ${e.name} (${e.code}): ${e.message}${e.retryable ? ' [retryable]' : ''}`);
+  else if (e.type === 'validation' && e.name !== lastLoggedValidation) {
+    lastLoggedValidation = e.name;
+    camLog(`camera signal ${e.name}`);
+  } else if (e.type === 'log') camLog(e.text);
   if (win && !win.isDestroyed()) win.webContents.send('sdk:event', e);
 };
 const sdk = new SdkSession(process.env.SMARTSPECTRA_API_KEY?.trim() || undefined, send);
@@ -49,8 +69,8 @@ function createWindow(): void {
 
 ipcMain.handle('sdk:info', () => sdk.info(reportDir));
 ipcMain.handle('sdk:start', (_e, cameraId: string | null) => sdk.start(cameraId));
-ipcMain.handle('sdk:stop', async () => {
-  await sdk.stop();
+ipcMain.handle('sdk:stop', async (_e, reason: string) => {
+  await sdk.stop(reason === 'user' ? 'user' : 'internal');
   const file = saveReport();
   if (file) send({ type: 'log', text: `Field report saved: ${file}` });
 });

@@ -174,7 +174,10 @@ export class SdkSession {
       // we're about to retry with a smaller metric set.
       if (status === mod.ProcessingStatus.kError) {
         setTimeout(() => {
-          if (!this.switching && this.sdk === sdk) void this.teardown();
+          if (!this.switching && this.sdk === sdk) {
+            const last = this.errorsSeen[this.errorsSeen.length - 1];
+            void this.teardown(last ? `error: ${last.code} — ${last.message}` : 'error: the SDK stopped unexpectedly');
+          }
         }, 500);
       }
     });
@@ -207,7 +210,7 @@ export class SdkSession {
       if (e.code === ERR_METRIC_NOT_AUTHORIZED || e.code === ERR_CONFIGURATION_FAILED) {
         return this.fallBack(`${name}: ${e.message}`);
       }
-      await this.teardown();
+      await this.teardown(`error: ${name} — ${e.message ?? String(err)}`);
       return { ok: false, error: `${name}: ${e.message ?? String(err)}` };
     }
   }
@@ -217,7 +220,7 @@ export class SdkSession {
     if (this.switching) return { ok: true };
     this.switching = true;
     try {
-      await this.teardown();
+      await this.teardown('internal');
       if (this.setIndex >= METRIC_SETS.length - 1) {
         return { ok: false, error: `No metric set was accepted. Last error: ${reason}` };
       }
@@ -278,7 +281,7 @@ export class SdkSession {
     };
   }
 
-  private async teardown(): Promise<void> {
+  private async teardown(reason: string): Promise<void> {
     const sdk = this.sdk;
     this.sdk = null;
     if (this.running) {
@@ -286,7 +289,7 @@ export class SdkSession {
       this.signals.markStopped(this.stoppedAt);
       this.lastValidation = null;
       this.lastProcessing = null;
-      this.emit({ type: 'camera', on: false });
+      this.emit({ type: 'camera', on: false, reason });
     }
     this.running = false;
     if (!sdk) return;
@@ -311,7 +314,7 @@ export class SdkSession {
     return this.signals.window(fromMs, toMs);
   }
 
-  async stop(): Promise<void> {
-    await this.teardown();
+  async stop(reason: string = 'internal'): Promise<void> {
+    await this.teardown(reason);
   }
 }

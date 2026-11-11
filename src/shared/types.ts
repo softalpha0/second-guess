@@ -9,7 +9,8 @@ export type SdkEvent =
   | { type: 'live'; snapshot: LiveSnapshot; messagesPerSec: number }
   | { type: 'error'; code: number; name: string; message: string; retryable: boolean }
   | { type: 'metrics-set'; label: string; metrics: string[] }
-  | { type: 'camera'; on: boolean }
+  /** reason (when off): 'user' (Stop camera pressed), 'error: …', 'internal' (app restarted it). */
+  | { type: 'camera'; on: boolean; reason?: string }
   | { type: 'log'; text: string };
 
 export interface CameraEntry {
@@ -77,7 +78,8 @@ export interface CameraState {
 export interface SgApi {
   info(): Promise<SdkInfo>;
   start(cameraId: string | null): Promise<{ ok: boolean; error?: string }>;
-  stop(): Promise<void>;
+  /** reason: 'user' when the student pressed Stop camera. */
+  stop(reason?: 'user' | 'internal'): Promise<void>;
   cameraState(): Promise<CameraState>;
   recallWindow(fromMs: number, toMs: number): Promise<RecallSignals>;
   saveReport(): Promise<string | null>;
