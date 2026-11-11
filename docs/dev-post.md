@@ -1,6 +1,6 @@
 ---
 title: "Second Guess: flashcards that notice when you're guessing"
-published: false
+published: true
 tags: devchallenge, presagechallenge, electron, typescript
 ---
 
@@ -34,7 +34,7 @@ tags: devchallenge, presagechallenge, electron, typescript
 
 {% github softalpha0/second-guess %}
 
-Windows installer on the [Releases page](https://github.com/softalpha0/second-guess/releases) — add your own free Presage key in Settings. Evidence (SDK field report from a real run, test results, honest accuracy numbers): [docs/evidence](https://github.com/softalpha0/second-guess/tree/main/docs/evidence).
+Run it from source in four commands (see the README). Evidence (SDK field report from a real run, test results, honest accuracy numbers): [docs/evidence](https://github.com/softalpha0/second-guess/tree/main/docs/evidence).
 
 ## How It Responds to Human Signals
 

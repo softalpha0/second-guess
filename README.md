@@ -9,8 +9,7 @@ A desktop flashcard app that watches for hesitation *while you recall* an answer
 | | |
 |---|---|
 | 🎬 **Demo video (1:27)** | https://youtu.be/Bw7pHNqaJRY |
-| 💻 **Download (Windows)** | [Releases](https://github.com/softalpha0/second-guess/releases) — installer, see [Download](#download-windows) |
-| 📝 **DEV post** | _add link_ |
+| 📝 **DEV post** | https://dev.to/softalpha_0/second-guess-flashcards-that-notice-when-youre-guessing-4d9n |
 | 🧾 **Evidence** | [docs/evidence](docs/evidence/) — SDK field report from a real run, honest accuracy results, test results |
 
 Built for the **Presage SmartSpectra SDK Challenge** on DEV · categories: Best Thoughtful Real-World Use, Most Creative or Delightful Use.
@@ -59,7 +58,7 @@ All taken from the real app on my laptop with a real webcam.
 | Signal replay for a card | ✅ |
 | Progress over days, CSV export, light/dark theme, shortcut overlay (`?`) | ✅ |
 | Settings: threshold, signals on/off, camera, API key, delete all data | ✅ |
-| Windows installer | ✅ build config (`npm run dist`) |
+| Windows installer | build config ready (`npm run dist`), not published yet |
 
 ## How it responds to human signals (use of the technology)
 
@@ -130,15 +129,6 @@ decks/         capitals.csv · spanish.csv · webdev.csv
 test/          Vitest tests for src/core and storage
 docs/          evidence/ · screenshots/ · video/ · dev-post.md
 ```
-
-## Download (Windows)
-
-1. Download **`Second-Guess-Setup-1.0.0.exe`** from the [Releases page](https://github.com/softalpha0/second-guess/releases).
-2. Run it. Windows may show **"Windows protected your PC"** because this hackathon app isn't code-signed: **More info → Run anyway**.
-3. **Settings → Presage API key**: create a free key at [physiology.presagetech.com](https://physiology.presagetech.com/) and paste it (stored encrypted on your computer).
-4. Pick a deck and study. No key or webcam? It still works as plain flashcards.
-
-Needs Windows 10/11 (64-bit), a webcam and an internet connection.
 
 ## Run it locally
 
