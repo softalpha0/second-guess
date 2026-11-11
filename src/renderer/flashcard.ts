@@ -7,6 +7,7 @@ export interface FlashcardView {
   showBack(front: string, back: string): void;
   setChip(text: string | null, kind?: 'good' | 'warn' | 'muted'): void;
   setProgress(text: string): void;
+  hideHint(): void;
 }
 
 export function flashcard(): FlashcardView {
@@ -44,6 +45,9 @@ export function flashcard(): FlashcardView {
     },
     setProgress(text) {
       progress.textContent = text;
+    },
+    hideHint() {
+      hint.replaceChildren();
     },
   };
 }

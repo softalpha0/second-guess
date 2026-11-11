@@ -136,3 +136,13 @@ kbd {
 .result h2 { margin-top: 0; font-size: 20px; }
 .app-banner[hidden] { display: none; }
 .app-banner[hidden] { display: none; }
+
+/* ---- Verdict (M6) ---- */
+.verdict { margin-top: 14px; border-radius: 12px; padding: 14px 18px; border: 1px solid var(--line); background: var(--panel); text-align: center; }
+.verdict.sure { border-color: #2d5c45; }
+.verdict.sure .verdict-text { color: var(--good); }
+.verdict.hesitated { border-color: #8a6a26; background: #2e2716; }
+.verdict.hesitated .verdict-text { color: var(--warn); }
+.verdict-text { font-size: 22px; font-weight: 600; }
+.verdict-sub { color: var(--muted); font-size: 13px; margin-top: 6px; white-space: pre-wrap; }
+.guess-list { margin: 6px 0 10px; }

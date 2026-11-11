@@ -66,6 +66,16 @@ export interface Review {
   correct: boolean;
   /** Was there a usable camera reading for the recall window? */
   signal: 'good' | 'poor' | 'off';
+  /** M6: final verdict after any override. */
+  verdict?: 'sure' | 'hesitated' | 'no-reading' | 'not-checked';
+  /** Hesitation score 0–100 (null when not judged). */
+  score?: number | null;
+  /** Plain reasons, e.g. ["long pause", "looked away"]. */
+  reasons?: string[];
+  /** The student pressed H to change the verdict. */
+  overridden?: boolean;
+  /** Points per signal, for tuning (numbers only). */
+  parts?: Record<string, number>;
 }
 
 export interface CameraState {

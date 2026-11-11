@@ -34,6 +34,17 @@ Rules:
 - Reviews stored in reviews.json: deck, card, time, recallMs, correct, signal (good/poor/off). No signal series stored.
 - User data folder: %APPDATA%\second-guess on Windows (settings.json, decks.json, reviews.json).
 - `window.__sgGo(screen, params)` exists for automated UI checks (Playwright).
+- M6 hesitation score (src/core/hesitation.ts), right answers only. Strength 0–1 per signal × weight, sum capped 100,
+  threshold 50. Weights: recall 55, lookAway 30, breath 20, blink 15, expression 15, pulse 0.
+  - recall: log2(recall / warm-up median), 0 at ~1.4×, 1 at 4× → a very long pause (~3.7×+) flags on its own.
+  - lookAway: longest run with head yaw/pitch or eye direction beyond max(fixed floor, 4× warm-up spread); 0.6 s → 0,
+    1.8 s → 1. A gap >400 ms in face points ends a run (lost face ≠ looked away).
+  - blink: burst (2–5 more than expected) or none when ≥1.5–4 were expected.
+  - breath: longest near-flat run (range ≤ 0.5× warm-up spread); 2 s → 0, 4 s → 1.
+  - expression: mean (100−NEUTRAL) vs warm-up level, in spreads; 1.5 → 0, 4 → 1.
+  - Reasons: top two with ≥8 points. Poor window → "no reading" (not judged). Wrong / camera off → not checked.
+  - Sure verdicts auto-advance after 0.9 s; hesitated waits for Space. H toggles the verdict (overridden: true).
+  - Reviews now also store verdict, score, reasons, overridden, parts (points per signal) for tuning.
 
 ## SDK findings (M1)
 
