@@ -8,85 +8,14 @@
   </head>
   <body>
     <header class="topbar">
-      <div class="brand">Second Guess <span class="muted">· SDK check (M1)</span></div>
+      <button id="brand" class="brand linkish" title="Back to decks">Second Guess</button>
       <div class="cam">
         <span id="cam-indicator" class="cam-indicator off">● Camera off</span>
-        <button id="btn-stop-top" class="btn small" disabled>Stop camera</button>
+        <button id="btn-stop-camera" class="btn small" hidden>Stop camera</button>
       </div>
     </header>
-
-    <main class="layout">
-      <section class="panel">
-        <h2>Setup</h2>
-        <dl class="kv">
-          <dt>SDK</dt><dd id="sdk-version">…</dd>
-          <dt>API key</dt><dd id="key-status">…</dd>
-          <dt>Camera</dt>
-          <dd><select id="camera-select"><option value="">Default camera</option></select></dd>
-        </dl>
-        <div class="row">
-          <button id="btn-start" class="btn primary" disabled>Start</button>
-          <button id="btn-stop" class="btn" disabled>Stop</button>
-        </div>
-        <div id="setup-error" class="banner error hidden"></div>
-
-        <h2>Status</h2>
-        <dl class="kv">
-          <dt>Signals asked for</dt><dd id="metric-set">—</dd>
-          <dt>Processing</dt><dd id="processing">—</dd>
-          <dt>Camera signal</dt><dd id="validation">—</dd>
-          <dt>Updates / sec</dt><dd id="rate">—</dd>
-          <dt>Messages</dt><dd id="msg-count">0</dd>
-        </dl>
-
-        <h2>Field report</h2>
-        <p class="muted small">Every field the SDK sends is recorded (names, example numbers, counts — no images). Saved automatically when you press Stop.</p>
-        <div class="row">
-          <button id="btn-save" class="btn">Save report now</button>
-          <button id="btn-folder" class="btn">Open report folder</button>
-        </div>
-      </section>
-
-      <section class="tiles">
-        <div class="tile">
-          <div class="label">Pulse</div>
-          <div class="big" id="pulse">—</div>
-          <div class="sub" id="pulse-sub">bpm</div>
-        </div>
-        <div class="tile">
-          <div class="label">Breathing rate</div>
-          <div class="big" id="breath">—</div>
-          <div class="sub" id="breath-sub">per minute</div>
-        </div>
-        <div class="tile">
-          <div class="label">Blinking</div>
-          <div class="big"><span id="blink-dot" class="dot"></span> <span id="blink-count">0</span></div>
-          <div class="sub">blinks counted</div>
-        </div>
-        <div class="tile">
-          <div class="label">Talking</div>
-          <div class="big" id="talking">—</div>
-          <div class="sub">&nbsp;</div>
-        </div>
-        <div class="tile wide">
-          <div class="label">Breathing trace (last 20 s)</div>
-          <svg id="trace" viewBox="0 0 400 80" preserveAspectRatio="none"><polyline id="trace-line" points="" /></svg>
-        </div>
-        <div class="tile">
-          <div class="label">Expressions</div>
-          <div id="expressions" class="bars"><span class="muted">no data</span></div>
-        </div>
-        <div class="tile">
-          <div class="label">Face landmarks</div>
-          <svg id="landmarks" viewBox="0 0 100 100"></svg>
-          <div class="sub" id="landmark-sub">no data</div>
-        </div>
-        <div class="tile wide">
-          <div class="label">Log</div>
-          <ul id="log" class="log"></ul>
-        </div>
-      </section>
-    </main>
+    <div id="banner" class="app-banner" hidden></div>
+    <main id="view"></main>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

@@ -20,6 +20,21 @@ Rules:
 - Feature freeze: Fri Nov 20, 22:00 Lagos.
 - Add anything important you learn about the project here.
 
+## Decisions log
+- 2026-11-11: **Pulse weight = 0** in the per-card hesitation score (approved). Only ~2 readings per 77 s, too sparse
+  for a 2–10 s recall window. Keep the code path so S4 Settings can switch it on.
+- Built M2–M5 as one batch (approved). Camera starts at the camera check and stays on across screens until
+  "Stop camera" (header, always visible). Stopping it mid-study → banner, cards get signal "off", baseline cleared.
+- Baseline lives in memory for the app session only (light and seating change between sessions); warm-up runs once
+  per launch / after the camera was stopped.
+- Recall window = front shown → Space, both measured with Date.now() in the window; the background process maps SDK
+  timestamps onto the same clock (ClockAligner) and returns numbers only (RecallSignals: blink onsets, head/eye
+  direction ~10/s, breathing trace ~12/s, 100−NEUTRAL ~10/s, quality). Window is "good" when the camera signal was Ok
+  ≥70% of the time and face points arrived ≥8/s.
+- Reviews stored in reviews.json: deck, card, time, recallMs, correct, signal (good/poor/off). No signal series stored.
+- User data folder: %APPDATA%\second-guess on Windows (settings.json, decks.json, reviews.json).
+- `window.__sgGo(screen, params)` exists for automated UI checks (Playwright).
+
 ## SDK findings (M1)
 
 Status: **M1 done** — verified on the Windows PC on 2026-11-11 (see "Seen on this PC").

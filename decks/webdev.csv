@@ -1,0 +1,31 @@
+front,back
+What does HTML stand for?,HyperText Markup Language
+What does CSS stand for?,Cascading Style Sheets
+HTML tag for the largest heading?,<h1>
+HTML tag for a link?,<a> (with an href attribute)
+HTML attribute that gives an image its text alternative?,alt
+CSS property that changes text colour?,color
+CSS property for space inside an element's border?,padding
+CSS property for space outside an element's border?,margin
+CSS value of display that lays children out in a row or column?,flex
+Which CSS selector matches an element with id="main"?,#main
+Which CSS selector matches elements with class="card"?,.card
+JavaScript keyword for a variable that can't be reassigned?,const
+What does === check in JavaScript?,Equal value and equal type (no type conversion)
+JavaScript method to add an item to the end of an array?,push()
+What does JSON stand for?,JavaScript Object Notation
+JavaScript function that turns an object into a JSON string?,JSON.stringify()
+What does DOM stand for?,Document Object Model
+DOM method to find the first element matching a CSS selector?,document.querySelector()
+HTTP status code for "Not Found"?,404
+HTTP status code for "OK"?,200
+HTTP method usually used to send form data that creates something?,POST
+What does URL stand for?,Uniform Resource Locator
+What does the S in HTTPS add?,Secure: the connection is encrypted (TLS)
+Git command to record staged changes?,git commit
+Git command to download and merge changes from the remote?,git pull
+What file lists a Node.js project's dependencies?,package.json
+Command to install a project's npm dependencies?,npm install
+Keyword that pauses an async function until a promise settles?,await
+What does API stand for?,Application Programming Interface
+HTML element for a numbered list?,<ol>

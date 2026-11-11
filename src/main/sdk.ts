@@ -8,7 +8,8 @@
 //
 // No Electron imports here, so the same code runs in the headless probe.
 
-import type { SdkEvent, SdkInfo, CameraEntry } from '../shared/types';
+import type { SdkEvent, SdkInfo, CameraEntry, CameraState } from '../shared/types';
+import { SignalBuffer, type RecallSignals } from '../core/signals';
 import { LiveTracker, type DecodedMetrics } from '../core/live-metrics';
 import { createSchema, recordMessage, schemaToList, truncateArrays, type FieldSchema } from '../core/field-schema';
 
@@ -77,6 +78,9 @@ export class SdkSession {
   private lastSampleAt = 0;
   private running = false;
   private switching = false;
+  private signals = new SignalBuffer();
+  private lastValidation: string | null = null;
+  private lastProcessing: string | null = null;
 
   constructor(
     private apiKey: string | undefined,
@@ -164,6 +168,7 @@ export class SdkSession {
     sdk.on('processingStatus', (status) => {
       const name = nameOf(mod.ProcessingStatus, status);
       if (!this.statusesSeen.includes(name)) this.statusesSeen.push(name);
+      this.lastProcessing = name;
       this.emit({ type: 'processing', status, name });
       // A failure after start (e.g. key rejected): release the camera, unless
       // we're about to retry with a smaller metric set.
@@ -176,6 +181,8 @@ export class SdkSession {
     sdk.on('validationStatus', (code, _ts, hint) => {
       const name = nameOf(mod.ValidationCode, code);
       this.validationSeen[name] = (this.validationSeen[name] ?? 0) + 1;
+      this.lastValidation = name;
+      this.signals.addValidation(name, Date.now());
       this.emit({ type: 'validation', code, name, hint });
     });
     sdk.on('metrics', (buf) => this.onMetrics(buf));
@@ -237,6 +244,7 @@ export class SdkSession {
     this.rateWindow.push(now);
     while (this.rateWindow.length && this.rateWindow[0] < now - 5000) this.rateWindow.shift();
 
+    this.signals.ingest(obj, now);
     recordMessage(this.schema, obj);
     // keep the first few messages, then one every 10 s
     if (this.samples.length < 3 || (this.samples.length < MAX_SAMPLES && now - this.lastSampleAt > 10_000)) {
@@ -275,6 +283,9 @@ export class SdkSession {
     this.sdk = null;
     if (this.running) {
       this.stoppedAt = Date.now();
+      this.signals.markStopped(this.stoppedAt);
+      this.lastValidation = null;
+      this.lastProcessing = null;
       this.emit({ type: 'camera', on: false });
     }
     this.running = false;
@@ -289,6 +300,15 @@ export class SdkSession {
     } catch {
       /* already destroyed */
     }
+  }
+
+  cameraState(): CameraState {
+    return { on: this.running, processing: this.lastProcessing, validation: this.lastValidation };
+  }
+
+  /** Signals between two moments (ms, this computer's clock): the recall window. */
+  recallWindow(fromMs: number, toMs: number): RecallSignals {
+    return this.signals.window(fromMs, toMs);
   }
 
   async stop(): Promise<void> {
