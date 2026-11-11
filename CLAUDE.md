@@ -64,6 +64,11 @@ Rules:
 - S3 Progress screen (header / P): last 14 days stacked bars, lucky→sure count, still-shaky count.
 - S4 Settings (header / S): threshold 20–80, signal on/off (pulse locked off), camera, Check mode, Delete all data
   (removes settings, decks, reviews, schedule and the sdk-reports folder; stops the camera first).
+- Could items done: `?` shortcut overlay, Progress → Export CSV (BOM, formula-safe), Settings → Theme (system/dark/light;
+  all colours are CSS variables, light overrides at :root[data-theme=light]).
+- `npm run tune [reviews.json]`: agreement per threshold + per-signal separation from Check-mode reviews (Nov 19).
+- Submission drafts: docs/dev-post.md (fill [BRACKETS], real agreement number only), docs/demo-script.md.
+- Fresh-clone check 2026-11-11: npm ci + 99 tests + build pass.
 
 ## SDK findings (M1)
 
