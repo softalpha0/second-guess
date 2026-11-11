@@ -1,0 +1,58 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Second Guess video cards</title>
+<style>
+  html,body{margin:0;height:100%;background:#14161c;color:#e8eaf0;font-family:"Segoe UI",Inter,system-ui,sans-serif;overflow:hidden}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 120px;opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .slide.on{opacity:1;transform:none}
+  h1{font-size:64px;margin:0 0 18px;font-weight:700;letter-spacing:-.5px}
+  h2{font-size:44px;margin:0 0 14px;font-weight:650}
+  p{font-size:30px;color:#a3a9ba;margin:6px 0;line-height:1.35}
+  .flow{display:flex;gap:22px;align-items:center;font-size:32px;margin-top:20px}
+  .pill{padding:14px 22px;border-radius:14px;border:1px solid #2b2f3a;background:#1c1f27}
+  .ok{color:#4cc38a;border-color:#2d5c45}.warn{color:#e7b24a;border-color:#8a6a26;background:#2e2716}.bad{color:#e5675f;border-color:#6b2f33}
+  .arrow{color:#59607a}
+  ul{list-style:none;padding:0;margin:10px 0 0}
+  li{font-size:30px;margin:12px 0;color:#e8eaf0}
+  li::before{content:"✓";color:#4cc38a;margin-right:16px}
+  .brand{font-size:84px;font-weight:750}
+  .accent{color:#6aa8ff}
+  .small{font-size:24px;color:#8a90a2}
+  .verdict{display:inline-block;margin-top:26px;padding:18px 28px;border-radius:14px;border:1px solid #8a6a26;background:#2e2716;color:#e7b24a;font-size:34px;font-weight:650}
+</style></head>
+<body>
+<div id="deck"></div>
+<script>
+const SETS = {
+  intro: [
+    [5200, `<h1>Flashcard apps trust you.</h1><p>You rate yourself — and a lucky guess looks exactly like knowledge.</p>`],
+    [5600, `<h2>So a guess gets scheduled like real knowledge…</h2>
+      <div class="flow"><span class="pill ok">Right (a guess)</span><span class="arrow">→</span><span class="pill">next review: next week</span><span class="arrow">→</span><span class="pill bad">forgotten before the exam</span></div>`],
+    [5200, `<div class="brand">Second <span class="accent">Guess</span></div><p>Flashcards that notice when you're guessing — using your webcam and the Presage SmartSpectra SDK.</p>`],
+  ],
+  outro: [
+    [7600, `<h2>Consent and data</h2><ul>
+      <li>The camera starts only after a consent screen</li>
+      <li>No video, frames or images are stored or sent by Second Guess</li>
+      <li>SDK telemetry off · study data stays on your computer</li>
+      <li>Delete all data in Settings, any time</li></ul>`],
+    [6000, `<h2>Thoughtful by design</h2><ul>
+      <li>Compared only with your own warm-up</li>
+      <li>Unclear camera view → "no reading", never a guess</li>
+      <li>No camera? Plain flashcards</li></ul>
+      <p class="small" style="margin-top:22px">Measures study hesitation — not stress, emotion or health.</p>`],
+    [7000, `<div class="brand">Second <span class="accent">Guess</span></div>
+      <p style="font-size:34px;color:#e8eaf0">github.com/softalpha0/second-guess</p>
+      <p class="small">Built with the Presage SmartSpectra SDK · #presagechallenge</p>`],
+  ],
+};
+const set = SETS[new URLSearchParams(location.search).get('set') || 'intro'];
+const deck = document.getElementById('deck');
+const els = set.map(([, html]) => { const d = document.createElement('div'); d.className = 'slide'; d.innerHTML = html; deck.append(d); return d; });
+let t = 300;
+set.forEach(([ms], i) => {
+  setTimeout(() => { els.forEach((e) => e.classList.remove('on')); els[i].classList.add('on'); }, t);
+  t += ms;
+});
+setTimeout(() => els.forEach((e) => e.classList.remove('on')), t);
+window.__total = t + 700;
+</script></body></html>

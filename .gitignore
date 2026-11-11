@@ -8,3 +8,4 @@ sdk-reports/
 *.zip
 *.patch
 release/
+docs/video/*.mp4
