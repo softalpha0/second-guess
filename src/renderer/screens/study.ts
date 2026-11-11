@@ -64,6 +64,11 @@ export const studyScreen: Screen = async (root, go, params) => {
         : null,
       picked.practice ? h('div.notice.small', {}, 'All caught up! Practising the cards that are due soonest.') : null,
       checkMode ? h('div.notice.small', {}, h('strong', {}, 'Check mode: '), 'after each right answer, tell us honestly whether it was a guess. Second Guess keeps its own verdict hidden until the summary.') : null,
+      settings.checkMode && !checkMode
+        ? h('div.notice.error.small', {}, h('strong', {}, 'Check mode is on but can\u2019t run in this session: '),
+            session.noCamera ? 'the camera is off.' : 'the warm-up didn\u2019t get a clear camera view. Redo it with your face and shoulders in view.',
+            ' ', h('button.btn.small', { onclick: () => go(session.noCamera ? 'decks' : 'camera-check', params) }, session.noCamera ? 'Back to decks' : 'Redo camera check + warm-up'))
+        : null,
       body,
     ),
   );
