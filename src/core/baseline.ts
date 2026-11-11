@@ -8,6 +8,8 @@ import { median, robustSpread } from './stats';
 export interface WarmupAnswer {
   recallMs: number;
   correct: boolean;
+  /** Length of the question text, for the reading-time allowance. */
+  frontLength?: number;
 }
 
 export interface SignalBaseline {
@@ -34,6 +36,8 @@ export interface Baseline {
   createdAt: string;
   /** Median recall time on the easy cards. */
   recallMedianMs: number;
+  /** Average question length (characters) of the warm-up cards. */
+  frontLength: number;
   cardsUsed: number;
   /** null when the camera was off or the signal was poor during warm-up. */
   signals: SignalBaseline | null;
@@ -44,11 +48,14 @@ export interface Baseline {
 // Floors stop a perfectly still warm-up from making tiny wobbles look huge later.
 const FLOOR = { yaw: 0.02, pitch: 0.02, gaze: 0.03, breath: 0.05, expr: 3 };
 const MIN_RECALL_MS = 400;
+export const DEFAULT_FRONT_LENGTH = 16;
 
 export function computeBaseline(answers: WarmupAnswer[], whole: RecallSignals | null, now = new Date()): Baseline {
   const right = answers.filter((a) => a.correct).map((a) => a.recallMs);
   const recallMedianMs = Math.max(MIN_RECALL_MS, median(right.length ? right : answers.map((a) => a.recallMs)) ?? 1500);
-  const base = { createdAt: now.toISOString(), recallMedianMs, cardsUsed: right.length };
+  const lens = answers.map((a) => a.frontLength).filter((n): n is number => typeof n === 'number');
+  const frontLength = lens.length ? lens.reduce((a, b) => a + b, 0) / lens.length : DEFAULT_FRONT_LENGTH;
+  const base = { createdAt: now.toISOString(), recallMedianMs, frontLength, cardsUsed: right.length };
 
   if (!whole) return { ...base, signals: null, signalsMissingReason: 'Camera was off during the warm-up.' };
   if (!whole.quality.good) {

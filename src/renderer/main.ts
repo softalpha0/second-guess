@@ -10,6 +10,8 @@ import { warmupScreen } from './screens/warmup';
 import { studyScreen } from './screens/study';
 import { sdkCheckScreen } from './screens/sdk-check';
 import { summaryScreen } from './screens/summary';
+import { settingsScreen } from './screens/settings';
+import { progressScreen } from './screens/progress';
 
 declare global {
   interface Window {
@@ -21,7 +23,7 @@ export interface ScreenHandle {
   onKey?(e: KeyboardEvent): void;
   dispose?(): void;
 }
-export type ScreenName = 'decks' | 'consent' | 'camera-check' | 'warmup' | 'study' | 'sdk-check' | 'summary';
+export type ScreenName = 'decks' | 'consent' | 'camera-check' | 'warmup' | 'study' | 'sdk-check' | 'summary' | 'settings' | 'progress';
 export type Go = (name: ScreenName, params?: Record<string, string>) => void;
 export type Screen = (root: HTMLElement, go: Go, params: Record<string, string>) => ScreenHandle | void | Promise<ScreenHandle | void>;
 
@@ -33,6 +35,8 @@ const screens: Record<ScreenName, Screen> = {
   study: studyScreen,
   'sdk-check': sdkCheckScreen,
   summary: summaryScreen,
+  settings: settingsScreen,
+  progress: progressScreen,
 };
 
 const view = document.getElementById('view')!;
@@ -63,6 +67,8 @@ const indicator = document.getElementById('cam-indicator')!;
 const stopBtn = document.getElementById('btn-stop-camera') as HTMLButtonElement;
 stopBtn.addEventListener('click', () => void window.sg.stop('user'));
 document.getElementById('brand')!.addEventListener('click', () => go('decks'));
+document.getElementById('btn-settings')!.addEventListener('click', () => go('settings'));
+document.getElementById('btn-progress')!.addEventListener('click', () => go('progress'));
 
 let wasOn = false;
 camera.subscribe((s) => {

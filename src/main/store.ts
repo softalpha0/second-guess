@@ -9,6 +9,7 @@ import { basename, join } from 'node:path';
 import { hashText, importCsv, importDeckFile, type Card } from '../core/deck-import';
 import type { DeckSummary, Deck, Review, Settings, ImportOutcome } from '../shared/types';
 import { cardKey, deckProgress, toDay, type CardState } from '../core/scheduler';
+import { DEFAULT_ENABLED, DEFAULT_THRESHOLD } from '../core/hesitation';
 
 const BUILTIN_NAMES: Record<string, string> = {
   capitals: 'World capitals',
@@ -44,7 +45,15 @@ export class Store {
   }
 
   getSettings(): Settings {
-    return { consentAt: null, cameraId: null, ...this.read<Partial<Settings>>('settings.json', {}) };
+    const saved = this.read<Partial<Settings>>('settings.json', {});
+    return {
+      consentAt: null,
+      cameraId: null,
+      threshold: DEFAULT_THRESHOLD,
+      checkMode: false,
+      ...saved,
+      signals: { ...DEFAULT_ENABLED, ...(saved.signals ?? {}) },
+    };
   }
 
   updateSettings(patch: Partial<Settings>): Settings {

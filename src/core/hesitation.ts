@@ -26,6 +26,31 @@ export const DEFAULT_WEIGHTS: Record<SignalKey, number> = {
 
 export const DEFAULT_THRESHOLD = 50;
 
+/** Which signals the student has switched on in Settings (S4). Pulse is off by default. */
+export const DEFAULT_ENABLED: Record<SignalKey, boolean> = {
+  recall: true, lookAway: true, breath: true, blink: true, expression: true, pulse: false,
+};
+
+/** Weights with switched-off signals set to 0. */
+export function weightsFor(enabled: Partial<Record<SignalKey, boolean>>): Record<SignalKey, number> {
+  const w = { ...DEFAULT_WEIGHTS };
+  for (const k of Object.keys(w) as SignalKey[]) if (enabled[k] === false) w[k] = 0;
+  return w;
+}
+
+/**
+ * Reading allowance: longer questions take longer to read, which isn't
+ * hesitation. Each character beyond the warm-up's average length earns this
+ * many ms (≈ a comfortable reading speed).
+ */
+export const READ_MS_PER_CHAR = 35;
+
+export function readingAdjustedRecall(recallMs: number, frontLength: number | undefined, baseline: Baseline): number {
+  if (frontLength === undefined) return recallMs;
+  const extra = Math.max(0, frontLength - (baseline.frontLength ?? 16)) * READ_MS_PER_CHAR;
+  return Math.max(Math.min(recallMs, baseline.recallMedianMs), recallMs - extra);
+}
+
 export type Verdict =
   | 'sure' // right, no hesitation
   | 'hesitated' // right, but hesitated
@@ -138,6 +163,8 @@ export interface ScoreInput {
   baseline: Baseline | null;
   weights?: Record<SignalKey, number>;
   threshold?: number;
+  /** Question length in characters (reading allowance). */
+  frontLength?: number;
 }
 
 export function scoreHesitation(input: ScoreInput): HesitationResult {
@@ -155,7 +182,8 @@ export function scoreHesitation(input: ScoreInput): HesitationResult {
   const add = (key: SignalKey, strength: number, reason: string) =>
     candidates.push({ key, points: w[key] * strength, reason });
 
-  add('recall', recallStrength(recallMs, baseline.recallMedianMs), 'long pause');
+  const adjusted = readingAdjustedRecall(recallMs, input.frontLength, baseline);
+  add('recall', recallStrength(adjusted, baseline.recallMedianMs), 'long pause');
   add('lookAway', lookAwayStrength(signals, b).strength, 'looked away');
   const blink = blinkStrength(signals, b);
   add('blink', blink.strength, blink.kind === 'none' ? 'stopped blinking' : 'blinked a lot');
@@ -164,7 +192,7 @@ export function scoreHesitation(input: ScoreInput): HesitationResult {
   // pulse: weight 0 by default and no per-card reading — left out on purpose.
 
   const parts: HesitationResult['parts'] = {};
-  for (const c of candidates) parts[c.key] = Math.round(c.points * 10) / 10;
+  for (const c of candidates) if (w[c.key] > 0) parts[c.key] = Math.round(c.points * 10) / 10;
   const score = Math.min(100, Math.round(candidates.reduce((a, c) => a + c.points, 0)));
   const reasons = candidates
     .filter((c) => c.points >= 8) // too small to be worth mentioning

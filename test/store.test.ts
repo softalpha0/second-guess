@@ -42,6 +42,7 @@ describe('store', () => {
     const dir = tmp();
     const s = new Store(dir, dir);
     expect(s.getSettings().consentAt).toBeNull();
+    expect(s.getSettings()).toMatchObject({ threshold: 50, checkMode: false, signals: { recall: true, pulse: false } });
     s.updateSettings({ consentAt: '2026-11-11T10:00:00Z' });
     s.addReviews([{ deckId: 'd', cardId: 'c', at: 'now', recallMs: 1200, correct: true, signal: 'good' }]);
     expect(new Store(dir, dir).getSettings().consentAt).toBe('2026-11-11T10:00:00Z');

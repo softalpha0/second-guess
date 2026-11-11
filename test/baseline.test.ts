@@ -28,6 +28,7 @@ describe('warm-up baseline', () => {
     const b = computeBaseline([...answers, { recallMs: 20000, correct: false }], null);
     expect(b.recallMedianMs).toBe(1150);
     expect(b.cardsUsed).toBe(8);
+    expect(b.frontLength).toBe(16); // default when lengths are not given
   });
 
   it('learns blink rate, head centre and resting face', () => {

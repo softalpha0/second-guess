@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   blinkStrength, breathStrength, expressionStrength, lookAwayStrength, recallStrength,
-  scoreHesitation, verdictText,
+  scoreHesitation, verdictText, weightsFor,
 } from '../src/core/hesitation';
 import type { Baseline } from '../src/core/baseline';
 import type { RecallSignals } from '../src/core/signals';
@@ -10,6 +10,7 @@ const baseline: Baseline = {
   createdAt: 'x',
   recallMedianMs: 1000,
   cardsUsed: 8,
+  frontLength: 16,
   signalsMissingReason: null,
   signals: {
     blinkPerMin: 15,
@@ -134,6 +135,22 @@ describe('hesitation score', () => {
     expect(scoreHesitation({ correct: false, recallMs: 9000, signals: calm(9000), baseline }).verdict).toBe('not-checked');
     expect(scoreHesitation({ correct: true, recallMs: 9000, signals: null, baseline }).verdict).toBe('not-checked');
     expect(scoreHesitation({ correct: true, recallMs: 9000, signals: calm(9000), baseline: { ...baseline, signals: null } }).verdict).toBe('not-checked');
+  });
+
+  it('long questions get a reading allowance', () => {
+    // 4 s on a 16-char question is a long pause; on a 76-char question 2.1 s of it is reading
+    const short = scoreHesitation({ correct: true, recallMs: 4000, signals: calm(4000), baseline, frontLength: 16 });
+    const long = scoreHesitation({ correct: true, recallMs: 4000, signals: calm(4000), baseline, frontLength: 76 });
+    expect(short.parts.recall).toBe(55);
+    expect(long.parts.recall!).toBeLessThan(20);
+  });
+
+  it('switched-off signals are ignored', () => {
+    const s = calm(4000);
+    for (const h of s.head) if (h.t >= 1000 && h.t < 3000) h.yaw = 0.3;
+    const r = scoreHesitation({ correct: true, recallMs: 1000, signals: s, baseline, weights: weightsFor({ lookAway: false }) });
+    expect(r.verdict).toBe('sure');
+    expect(r.parts.lookAway).toBeUndefined();
   });
 
   it('threshold is adjustable', () => {

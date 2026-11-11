@@ -3,6 +3,7 @@ import type { LiveSnapshot } from '../core/live-metrics';
 import type { Card } from '../core/deck-import';
 import type { RecallSignals } from '../core/signals';
 import type { CardState } from '../core/scheduler';
+import type { SignalKey } from '../core/hesitation';
 
 export type SdkEvent =
   | { type: 'processing'; status: number; name: string }
@@ -34,6 +35,12 @@ export interface Settings {
   consentAt: string | null;
   /** Chosen camera id, or null for the default camera. */
   cameraId: string | null;
+  /** S4: hesitation threshold 0–100 (default 50). */
+  threshold: number;
+  /** S4: which signals are used. */
+  signals: Record<SignalKey, boolean>;
+  /** S1: ask "Was that a guess?" instead of showing the verdict. */
+  checkMode: boolean;
 }
 
 export interface Deck {
@@ -80,6 +87,9 @@ export interface Review {
   overridden?: boolean;
   /** Points per signal, for tuning (numbers only). */
   parts?: Record<string, number>;
+  /** S1 Check mode: the student's own answer to "Was that a guess?". */
+  selfGuess?: boolean;
+  checkMode?: boolean;
 }
 
 export interface CameraState {
@@ -110,4 +120,7 @@ export interface SgApi {
   /** M7: saved schedule for a deck, keyed "deckId|cardId". */
   getSchedule(deckId: string): Promise<Record<string, CardState>>;
   saveCardStates(states: CardState[]): Promise<void>;
+  getReviews(): Promise<Review[]>;
+  /** S4: delete settings, imported decks, history, schedule and logs. */
+  deleteAllData(): Promise<void>;
 }

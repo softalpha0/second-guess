@@ -53,7 +53,7 @@ export const warmupScreen: Screen = (root, go, params) => {
     finished = true;
     const endedAt = Date.now();
     const whole = camera.state.on ? await window.sg.recallWindow(startedAt, endedAt) : null;
-    const baseline = computeBaseline(study.results.map((r) => ({ recallMs: r.recallMs, correct: r.correct })), whole);
+    const baseline = computeBaseline(study.results.map((r) => ({ recallMs: r.recallMs, correct: r.correct, frontLength: r.card.front.length })), whole);
     session.baseline = baseline;
     const lines = describeBaseline(baseline);
     body.replaceChildren(

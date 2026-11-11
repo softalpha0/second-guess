@@ -5,6 +5,8 @@
 import type { SdkEvent } from '../shared/types';
 import type { Baseline } from '../core/baseline';
 import type { SessionSummary } from '../core/summary';
+import type { ReplayTracks } from '../core/replay';
+import type { Agreement } from '../core/check-mode';
 
 export interface CameraStatus {
   on: boolean;
@@ -69,6 +71,10 @@ export const session = {
   noCameraReason: null as string | null,
   /** Last finished session, for the summary screen (M8). */
   lastSummary: null as (SessionSummary & { deckId: string; deckName: string; practice: boolean }) | null,
+  /** S2: recall-window tracks for this session's right answers (memory only, never saved). */
+  lastReplays: [] as { front: string; back: string; verdict: string; score: number | null; reasons: string[]; selfGuess?: boolean; tracks: ReplayTracks }[],
+  /** S1: this session's Check mode agreement, or null when Check mode was off. */
+  lastAgreement: null as Agreement | null,
 };
 
 /** Top-of-window banner (e.g. "Camera off — plain flashcards"), with an optional button. */

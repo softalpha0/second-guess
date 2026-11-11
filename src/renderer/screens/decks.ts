@@ -104,7 +104,7 @@ export const decksScreen: Screen = async (root, go) => {
         h('button.btn', { onclick: () => void doImport() }, 'Import deck…'),
         h('span.small.muted', {}, 'CSV with front,back — or Anki “Notes in Plain Text” export'),
       ),
-      h('p.keys', {}, kbd('↑'), kbd('↓'), ' choose   ', kbd('Enter'), ' study   ', kbd('I'), ' import   ', kbd('Delete'), ' remove imported deck'),
+      h('p.keys', {}, kbd('↑'), kbd('↓'), ' choose   ', kbd('Enter'), ' study   ', kbd('I'), ' import   ', kbd('Delete'), ' remove imported deck   ', kbd('P'), ' progress   ', kbd('S'), ' settings'),
       h('p.small', {}, h('button.linkish.muted', { onclick: () => go('sdk-check') }, 'SDK check (developer)')),
     ),
   );
@@ -117,6 +117,8 @@ export const decksScreen: Screen = async (root, go) => {
       else if (e.key === 'Enter') void study();
       else if (e.key.toLowerCase() === 'i') void doImport();
       else if (e.key === 'Delete') void doDelete();
+      else if (e.key.toLowerCase() === 's') go('settings');
+      else if (e.key.toLowerCase() === 'p') go('progress');
     },
   };
 };

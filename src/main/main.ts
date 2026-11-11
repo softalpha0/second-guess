@@ -2,7 +2,7 @@
 // and answers the window's requests over IPC.
 import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
 import { join } from 'node:path';
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, mkdirSync, rmSync } from 'node:fs';
 import { config as loadEnv } from 'dotenv';
 import { SdkSession } from './sdk';
 import { writeReport } from './report';
@@ -86,6 +86,12 @@ ipcMain.handle('store:get-deck', (_e, id: string) => store.getDeck(id));
 ipcMain.handle('store:delete-deck', (_e, id: string) => store.deleteDeck(id));
 ipcMain.handle('store:add-reviews', (_e, reviews: Review[]) => store.addReviews(reviews));
 ipcMain.handle('store:get-schedule', (_e, deckId: string) => store.getSchedule(deckId));
+ipcMain.handle('store:get-reviews', () => store.getReviews());
+ipcMain.handle('store:delete-all', async () => {
+  await sdk.stop('internal');
+  store.deleteAll();
+  rmSync(reportDir, { recursive: true, force: true }); // field reports + camera log
+});
 ipcMain.handle('store:save-card-states', (_e, states: CardState[]) => store.saveCardStates(states));
 ipcMain.handle('store:import-deck', async () => {
   const res = await dialog.showOpenDialog(win!, {

@@ -42,8 +42,10 @@ _Mark honestly what works in the submitted version._
 | Scheduling that brings guesses back sooner, with override | ✅ |
 | Session summary | ✅ |
 | Works without a camera (plain flashcards) | ✅ |
-| Check mode: measures how often it agrees with you | ⬜ |
-| Signal replay for a card | ⬜ |
+| Check mode: measures how often it agrees with you | ✅ |
+| Signal replay for a card | ✅ |
+| Progress over days (lucky guesses that became sure) | ✅ |
+| Settings: threshold, signals, camera, delete all data | ✅ |
 
 ## How it responds to human signals
 

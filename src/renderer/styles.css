@@ -169,3 +169,34 @@ kbd {
 .tag.hesitated { color: var(--warn); border-color: #6b5a2f; }
 .tag.wrong { color: var(--bad); border-color: #6b2f33; }
 .notice.nocam { background: #262230; border-color: #4a3f66; }
+
+/* ---- Settings / progress (S1–S4) ---- */
+.setting-list { display: grid; gap: 8px; }
+.setting-row { display: flex; gap: 10px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.setting-row input[type=checkbox] { margin-top: 3px; width: 16px; height: 16px; }
+input[type=range] { width: 280px; accent-color: var(--accent); }
+.btn.danger { background: #3a1f22; border-color: #6b2f33; color: #ffb3ad; }
+.btn.danger:hover { border-color: var(--bad); }
+.stat.good-stat .stat-value { color: var(--good); }
+.progress-chart { width: 100%; max-width: 760px; }
+.progress-chart .bar.sure { fill: var(--good); }
+.progress-chart .bar.hesitated { fill: var(--warn); }
+.progress-chart .bar.unjudged { fill: #59607a; }
+.progress-chart .bar.wrong { fill: var(--bad); }
+.progress-chart .axis { fill: var(--muted); font-size: 11px; text-anchor: middle; }
+.cam .linkish { margin-right: 6px; }
+.verdict.ask { border-color: var(--accent); }
+.verdict.ask .verdict-text { color: var(--text); }
+.replay { background: #10121a; border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin: 8px 0 4px; }
+.replay svg { width: 100%; }
+.replay .lane-label { fill: var(--muted); font-size: 11px; }
+.replay .line { fill: none; stroke-width: 1.5; }
+.replay .away-line { stroke: var(--warn); }
+.replay .breath-line { stroke: var(--accent); }
+.replay .expr-line { stroke: #b88cff; }
+.replay .limit { stroke: #5a4a26; stroke-dasharray: 4 4; }
+.replay .blink { stroke: var(--text); stroke-width: 2; }
+.replay .flat { fill: rgba(231, 178, 74, .18); }
+.replay .recall-bar { fill: var(--warn); }
+.replay .normal-bar { fill: #3a4152; }
+.tag.sure-tag { color: var(--good); border-color: #2d5c45; }

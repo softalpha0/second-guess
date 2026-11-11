@@ -54,6 +54,16 @@ Rules:
   missed/hesitated cards plus a count of others due tomorrow.
 - M9 no-camera mode: no key or SDK load failure → plain flashcards automatically (skips consent/camera check), notice on
   decks and study screens; user can also choose it. Cards still scheduled; right answers count as "not judged".
+- Reading allowance (after the user's first real verdict on a long question): recall time minus 35 ms per character
+  beyond the warm-up's average question length (never below the warm-up median) before scoring "long pause".
+- S1 Check mode (Settings): after a Right answer asks "Was that a guess?" Y/N, hides the app verdict, the student's
+  answer decides the schedule. Reviews store selfGuess + checkMode; agreement = (caught + bothSure) / judged rights.
+  Shown on the summary, Settings and Progress. Use this number in the DEV post.
+- S2 Signal replay (summary): per right answer, timeline of time-to-reveal vs usual, looking-away distance (1 = limit),
+  blinks, breathing with flat parts shaded, expression change. Kept in memory for the session only, never saved.
+- S3 Progress screen (header / P): last 14 days stacked bars, lucky→sure count, still-shaky count.
+- S4 Settings (header / S): threshold 20–80, signal on/off (pulse locked off), camera, Check mode, Delete all data
+  (removes settings, decks, reviews, schedule and the sdk-reports folder; stops the camera first).
 
 ## SDK findings (M1)
 

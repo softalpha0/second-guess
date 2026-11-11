@@ -10,7 +10,9 @@ import { h, kbd } from '../ui';
 import { camera, session } from '../app';
 import { flashcard } from '../flashcard';
 import { StudySession, type CardResult } from '../../core/study-session';
-import { scoreHesitation, verdictText, type HesitationResult, type Verdict } from '../../core/hesitation';
+import { scoreHesitation, verdictText, weightsFor, type HesitationResult, type Verdict } from '../../core/hesitation';
+import { replayTracks } from '../../core/replay';
+import { agreement } from '../../core/check-mode';
 import { addDays, cardKey, pickSession, schedule, toDay, type CardState, type Outcome } from '../../core/scheduler';
 import { summarize, type Attempt } from '../../core/summary';
 import { DEFAULT_SESSION_SIZE } from '../../core/study-session';
@@ -22,6 +24,9 @@ interface Answered {
   hesitation: HesitationResult;
   verdict: Verdict;
   overridden: boolean;
+  signals: RecallSignals | null;
+  /** S1 Check mode: the student's answer to "Was that a guess?". */
+  selfGuess?: boolean;
 }
 
 type Pending = Promise<{ signals: RecallSignals | null; signal: Review['signal'] }>;
@@ -39,6 +44,11 @@ export const studyScreen: Screen = async (root, go, params) => {
   }
 
   const today = toDay(new Date());
+  const settings = await window.sg.getSettings();
+  const weights = weightsFor(settings.signals);
+  // Check mode only makes sense when the app can judge (camera + warm-up)
+  const checkMode = settings.checkMode && !session.noCamera && !!session.baseline?.signals;
+  session.lastReplays = [];
   const states: Record<string, CardState> = await window.sg.getSchedule(deck.id);
   const picked = pickSession(deck.cards, deck.id, states, today, DEFAULT_SESSION_SIZE);
 
@@ -53,6 +63,7 @@ export const studyScreen: Screen = async (root, go, params) => {
         ? h('div.notice.nocam.small', {}, h('strong', {}, 'No camera mode — plain flashcards. '), session.noCameraReason ?? '')
         : null,
       picked.practice ? h('div.notice.small', {}, 'All caught up! Practising the cards that are due soonest.') : null,
+      checkMode ? h('div.notice.small', {}, h('strong', {}, 'Check mode: '), 'after each right answer, tell us honestly whether it was a guess. Second Guess keeps its own verdict hidden until the summary.') : null,
       body,
     ),
   );
@@ -128,18 +139,41 @@ export const studyScreen: Screen = async (root, go, params) => {
       recallMs: result.recallMs,
       signals: session.noCamera ? null : signals,
       baseline: session.baseline,
+      weights,
+      threshold: settings.threshold,
+      frontLength: result.card.front.length,
     });
-    const a: Answered = { result, retry: failedThisSession.has(result.card.id), signal, hesitation, verdict: hesitation.verdict, overridden: false };
+    const a: Answered = { result, retry: failedThisSession.has(result.card.id), signal, hesitation, verdict: hesitation.verdict, overridden: false, signals };
 
     if (!correct) return commit(a); // wrong: no check, move straight on
     feedback = a;
+    if (checkMode && (a.verdict === 'sure' || a.verdict === 'hesitated')) {
+      renderAsk();
+      return;
+    }
     renderVerdict(a);
     // a confident answer moves on by itself; a hesitation waits so it can be read
     if (a.verdict !== 'hesitated') autoTimer = setTimeout(() => void next(), AUTO_NEXT_MS);
   }
 
-  function override(): void {
+  function renderAsk(): void {
+    verdictBox.className = 'verdict ask';
+    verdictBox.replaceChildren(
+      h('div.verdict-text', {}, 'Right! Was that a guess?'),
+      h('div.verdict-sub', {}, kbd('Y'), ' Yes, I guessed    ', kbd('N'), ' No, I knew it'),
+    );
+    verdictBox.hidden = false;
+    view.hideHint();
+  }
+
+  function answerCheck(guess: boolean): void {
     if (!feedback) return;
+    feedback.selfGuess = guess;
+    void next();
+  }
+
+  function override(): void {
+    if (!feedback || feedback.selfGuess !== undefined || checkMode) return;
     if (autoTimer) clearTimeout(autoTimer);
     autoTimer = null;
     const a = feedback;
@@ -167,15 +201,25 @@ export const studyScreen: Screen = async (root, go, params) => {
     const id = a.result.card.id;
     const outcome: Outcome = !a.result.correct
       ? 'wrong'
-      : a.verdict === 'hesitated' ? 'hesitated' : a.verdict === 'sure' ? 'sure' : 'unjudged';
+      : a.selfGuess !== undefined
+        ? a.selfGuess ? 'hesitated' : 'sure' // Check mode: the student's answer decides
+        : a.verdict === 'hesitated' ? 'hesitated' : a.verdict === 'sure' ? 'sure' : 'unjudged';
     const key = cardKey(deck!.id, id);
     const next = schedule({ prev: states[key] ?? null, deckId: deck!.id, cardId: id, outcome, today, failedThisSession: failedThisSession.has(id) });
     states[key] = next;
+    const self = a.selfGuess;
     attempts.push({
       cardId: id, front: a.result.card.front, back: a.result.card.back, correct: a.result.correct,
-      verdict: a.verdict, reasons: a.hesitation.reasons, overridden: a.overridden, retry: a.retry,
-      recallMs: a.result.recallMs, due: next.due,
+      verdict: self !== undefined ? (self ? 'hesitated' : 'sure') : a.verdict,
+      reasons: self !== undefined ? [] : a.hesitation.reasons,
+      overridden: self !== undefined ? false : a.overridden,
+      retry: a.retry, recallMs: a.result.recallMs, due: next.due,
     });
+    // S2: keep this card's tracks for the summary replay (memory only)
+    if (a.result.correct && a.signals && session.baseline && (a.verdict === 'sure' || a.verdict === 'hesitated')) {
+      const tracks = replayTracks(a.signals, session.baseline, a.result.recallMs);
+      if (tracks) session.lastReplays.push({ front: a.result.card.front, back: a.result.card.back, verdict: a.verdict, score: a.hesitation.score, reasons: a.hesitation.reasons, selfGuess: self, tracks });
+    }
     if (!a.result.correct) {
       failedThisSession.add(id);
       const left = retriesLeft.get(id) ?? MAX_RETRIES;
@@ -201,6 +245,8 @@ export const studyScreen: Screen = async (root, go, params) => {
         reasons: a.hesitation.reasons,
         overridden: a.overridden,
         parts: a.hesitation.parts as Record<string, number>,
+        selfGuess: a.selfGuess,
+        checkMode: checkMode || undefined,
       },
     ]);
     if (last) finish();
@@ -219,6 +265,8 @@ export const studyScreen: Screen = async (root, go, params) => {
     if (attempts.length === 0) return go('decks');
     const checked = !session.noCamera && !!session.baseline?.signals;
     session.lastSummary = { ...summarize(attempts, addDays(today, 1), checked), deckId: deck!.id, deckName: deck!.name, practice: picked.practice };
+    const checkedOnes = answered.filter((a) => a.selfGuess !== undefined && (a.verdict === 'sure' || a.verdict === 'hesitated'));
+    session.lastAgreement = checkMode ? agreement(checkedOnes.map((a) => ({ appHesitated: a.verdict === 'hesitated', selfGuess: !!a.selfGuess }))) : null;
     go('summary', { deckId: deck!.id });
   }
 
@@ -228,6 +276,12 @@ export const studyScreen: Screen = async (root, go, params) => {
     onKey(e) {
       if (e.repeat) return;
       if (done) return;
+      if (feedback && feedback.selfGuess === undefined && verdictBox.classList.contains('ask')) {
+        if (e.key.toLowerCase() === 'y') answerCheck(true);
+        else if (e.key.toLowerCase() === 'n') answerCheck(false);
+        else if (e.key === 'Escape') void endEarly();
+        return;
+      }
       if (feedback) {
         if (e.key.toLowerCase() === 'h') override();
         else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); void next(); }
