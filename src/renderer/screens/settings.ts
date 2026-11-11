@@ -23,7 +23,7 @@ function thresholdWords(t: number): string {
 }
 
 export const settingsScreen: Screen = async (root, go) => {
-  const [settings, info, reviews] = await Promise.all([window.sg.getSettings(), window.sg.info(), window.sg.getReviews()]);
+  const [settings, info, reviews, keyInfo] = await Promise.all([window.sg.getSettings(), window.sg.info(), window.sg.getReviews(), window.sg.keyStatus()]);
   let s: Settings = settings;
   const save = async (patch: Partial<Settings>) => {
     s = await window.sg.updateSettings(patch);
@@ -62,6 +62,47 @@ export const settingsScreen: Screen = async (root, go) => {
   const checked = reviews.filter((r) => r.checkMode && r.selfGuess !== undefined && (r.verdict === 'sure' || r.verdict === 'hesitated'));
   const agree = agreement(checked.map((r) => ({ appHesitated: r.verdict === 'hesitated', selfGuess: !!r.selfGuess })));
 
+  function keySection(): HTMLElement {
+    const status = h('p.small');
+    const msg = h('p.small');
+    const input = h('input', { type: 'password', placeholder: 'Paste your API key', autocomplete: 'off', spellcheck: 'false', class: 'key-input' }) as HTMLInputElement;
+    const removeBtn = h('button.btn.small', {}, 'Remove key') as HTMLButtonElement;
+    const show = (k: typeof keyInfo) => {
+      status.replaceChildren(
+        k.source === 'settings' ? h('span.good', {}, `✓ Key saved (${k.hint}). `) :
+        k.source === 'env' ? h('span.good', {}, `✓ Using the key from the .env file (${k.hint}). `) :
+        h('span.warn', {}, 'No key yet — the app works as plain flashcards until you add one. '),
+      );
+      removeBtn.hidden = k.source !== 'settings';
+    };
+    show(keyInfo);
+    async function saveKey(): Promise<void> {
+      const r = await window.sg.saveKey(input.value);
+      input.value = '';
+      msg.textContent = r.ok ? 'Saved. It is stored encrypted on this computer and never shown again.' : r.error ?? 'Could not save.';
+      msg.className = `small ${r.ok ? 'good' : 'bad'}`;
+      if (r.ok) {
+        if (session.noCamera && session.noCameraReason?.includes('API key')) { session.noCamera = false; session.noCameraReason = null; }
+        show(await window.sg.keyStatus());
+      }
+    }
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.stopPropagation(); void saveKey(); } });
+    removeBtn.addEventListener('click', async () => {
+      if (!confirm('Remove the saved API key? The camera check will stop working until you add one again.')) return;
+      await window.sg.removeKey();
+      show(await window.sg.keyStatus());
+      msg.textContent = 'Key removed.';
+      msg.className = 'small';
+    });
+    return h('div', {},
+      status,
+      h('p.small.muted', {}, 'Needed for the camera check. Create a free key on Presage’s site, then paste it here. Each person uses their own key.'),
+      h('div.row', {}, input, h('button.btn', { onclick: () => void saveKey() }, 'Save key'), removeBtn),
+      h('button.linkish.small.muted', { onclick: () => void window.sg.openKeyPage() }, 'Get a key at physiology.presagetech.com ↗'),
+      msg,
+    );
+  }
+
   function themeSelect(): HTMLElement {
     const sel = h('select', {},
       h('option', { value: 'system' }, 'Same as Windows'),
@@ -77,7 +118,7 @@ export const settingsScreen: Screen = async (root, go) => {
   }
 
   async function deleteAll(): Promise<void> {
-    if (!confirm('Delete all Second Guess data on this computer?\n\nThis removes your study history, schedule, imported decks, settings and logs. It cannot be undone.')) return;
+    if (!confirm('Delete all Second Guess data on this computer?\n\nThis removes your study history, schedule, imported decks, settings, saved API key and logs. It cannot be undone.')) return;
     await window.sg.deleteAllData();
     session.baseline = null;
     session.lastSummary = null;
@@ -93,6 +134,9 @@ export const settingsScreen: Screen = async (root, go) => {
   root.append(
     h('section.page.narrow', {},
       h('h1', {}, 'Settings'),
+
+      h('h2', {}, 'Presage API key'),
+      keySection(),
 
       h('h2', {}, 'Hesitation threshold'),
       h('div.row', {}, slider, tVal),

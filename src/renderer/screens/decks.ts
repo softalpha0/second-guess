@@ -22,7 +22,7 @@ export const decksScreen: Screen = async (root, go) => {
     session.noCamera = true;
     session.noCameraReason = info.loadError
       ? 'The camera part (SmartSpectra SDK) could not load on this computer.'
-      : 'No Presage API key was found, so the camera can\u2019t be used.';
+      : 'No Presage API key yet, so the camera can\u2019t be used.';
   }
   const canUseCamera = !info.loadError && info.hasKey;
   let selected = 0;
@@ -90,7 +90,9 @@ export const decksScreen: Screen = async (root, go) => {
         `${session.noCameraReason ?? ''} Cards are still scheduled, but right answers aren\u2019t checked for hesitation. `,
         canUseCamera
           ? h('button.btn.small', { onclick: () => { session.noCamera = false; session.noCameraReason = null; go('decks'); } }, 'Use the camera again')
-          : h('span.small.muted', {}, 'To turn it on: add SMARTSPECTRA_API_KEY to the .env file and restart the app.'))
+          : info.loadError
+            ? h('span.small.muted', {}, 'The camera part could not load on this computer.')
+            : h('button.btn.small', { onclick: () => go('settings') }, 'Add your API key in Settings'))
     : null;
 
   root.append(

@@ -14,7 +14,7 @@ export async function beginStudy(go: Go, deckId: string): Promise<void> {
       session.noCamera = true;
       session.noCameraReason = info.loadError
         ? 'The camera part (SmartSpectra SDK) could not load on this computer.'
-        : 'No Presage API key was found, so the camera can\u2019t be used.';
+        : 'No Presage API key yet, so the camera can\u2019t be used.';
     }
   }
   if (session.noCamera) return go('study', { deckId });

@@ -4,16 +4,30 @@ import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
 import { join } from 'node:path';
 import { appendFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { config as loadEnv } from 'dotenv';
+
+// Installed app: the SDK's native runtime is shipped next to the app as
+// resources/smartspectra/ (a .dll can't be loaded from inside app.asar).
+// Must be set before the SDK is first required (it's loaded lazily).
+if (app.isPackaged) {
+  const lib = { win32: 'smartspectra_capi.dll', darwin: 'libsmartspectra_capi.dylib', linux: 'libsmartspectra_capi.so' }[process.platform as string];
+  if (lib) process.env.SMARTSPECTRA_CAPI_PATH = join(process.resourcesPath, 'smartspectra', lib);
+}
+
 import { SdkSession } from './sdk';
 import { writeReport } from './report';
 import { Store } from './store';
+import { KeyStore } from './keystore';
 import type { Review, SdkEvent, Settings } from '../shared/types';
 import type { CardState } from '../core/scheduler';
 
-// .env sits in the project folder next to package.json.
-loadEnv({ path: join(app.getAppPath(), '.env'), quiet: true });
+// One data folder for both the dev version and the installed app (%APPDATA%\\second-guess on Windows).
+app.setPath('userData', join(app.getPath('appData'), 'second-guess'));
 
-const reportDir = join(app.getAppPath(), 'sdk-reports');
+// Developers can keep the key in .env next to package.json; installed apps use Settings.
+if (!app.isPackaged) loadEnv({ path: join(app.getAppPath(), '.env'), quiet: true });
+
+// Field reports + camera log: project folder while developing, user-data folder when installed.
+const reportDir = app.isPackaged ? join(app.getPath('userData'), 'sdk-reports') : join(app.getAppPath(), 'sdk-reports');
 let win: BrowserWindow | null = null;
 let store: Store;
 
@@ -39,7 +53,8 @@ const send = (e: SdkEvent) => {
   } else if (e.type === 'log') camLog(e.text);
   if (win && !win.isDestroyed()) win.webContents.send('sdk:event', e);
 };
-const sdk = new SdkSession(process.env.SMARTSPECTRA_API_KEY?.trim() || undefined, send);
+const keys = new KeyStore(app.getPath('userData'), process.env.SMARTSPECTRA_API_KEY?.trim() || undefined);
+const sdk = new SdkSession(keys.current(), send);
 
 function saveReport(): string | null {
   const r = sdk.report();
@@ -87,6 +102,17 @@ ipcMain.handle('store:delete-deck', (_e, id: string) => store.deleteDeck(id));
 ipcMain.handle('store:add-reviews', (_e, reviews: Review[]) => store.addReviews(reviews));
 ipcMain.handle('store:get-schedule', (_e, deckId: string) => store.getSchedule(deckId));
 ipcMain.handle('store:get-reviews', () => store.getReviews());
+ipcMain.handle('key:status', () => keys.status());
+ipcMain.handle('key:save', (_e, key: string) => {
+  const r = keys.save(key);
+  if (r.ok) sdk.setApiKey(keys.current());
+  return r;
+});
+ipcMain.handle('key:remove', () => {
+  keys.remove();
+  sdk.setApiKey(keys.current());
+});
+ipcMain.handle('open:get-key-page', () => shell.openExternal('https://physiology.presagetech.com/'));
 ipcMain.handle('store:export-csv', async () => {
   const res = await dialog.showSaveDialog(win!, {
     title: 'Export progress',
@@ -100,6 +126,8 @@ ipcMain.handle('store:export-csv', async () => {
 ipcMain.handle('store:delete-all', async () => {
   await sdk.stop('internal');
   store.deleteAll();
+  keys.remove();
+  sdk.setApiKey(keys.current());
   rmSync(reportDir, { recursive: true, force: true }); // field reports + camera log
 });
 ipcMain.handle('store:save-card-states', (_e, states: CardState[]) => store.saveCardStates(states));

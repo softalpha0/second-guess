@@ -127,4 +127,10 @@ export interface SgApi {
   deleteAllData(): Promise<void>;
   /** Could: save all answers as a CSV file (asks where). Returns the path, or null if cancelled. */
   exportCsv(): Promise<string | null>;
+  /** Presage API key (Settings). The key itself is never sent to the window. */
+  keyStatus(): Promise<{ source: 'settings' | 'env' | null; hint: string | null; canSave: boolean }>;
+  saveKey(key: string): Promise<{ ok: boolean; error?: string }>;
+  removeKey(): Promise<void>;
+  /** Opens Presage's site in the browser, where the key is created. */
+  openKeyPage(): Promise<void>;
 }

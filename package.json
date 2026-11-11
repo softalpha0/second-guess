@@ -1,6 +1,6 @@
 {
   "name": "second-guess",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Flashcards that notice when you're guessing.",
   "license": "MIT",
@@ -15,7 +15,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build:tune": "esbuild src/probe/tune.ts --bundle --platform=node --format=cjs --target=node22 --outfile=dist/probe/tune.js --log-level=warning",
-    "tune": "npm run build:tune && node dist/probe/tune.js"
+    "tune": "npm run build:tune && node dist/probe/tune.js",
+    "dist": "npm run build && electron-builder --win --x64",
+    "dist:dir": "npm run build && electron-builder --dir"
   },
   "dependencies": {
     "@smartspectra/node-sdk": "^3.5.0",
@@ -24,9 +26,85 @@
   "devDependencies": {
     "@types/node": "^22.20.5",
     "electron": "^43.8.1",
+    "electron-builder": "^26.18.0",
     "esbuild": "^0.25.12",
     "typescript": "5.9",
     "vite": "^7.3.8",
     "vitest": "^5.1.0"
+  },
+  "productName": "Second Guess",
+  "author": "softalpha0",
+  "overrides": {
+    "minimatch@^9.0.0 || ^10.0.0": "11.0.1"
+  },
+  "build": {
+    "appId": "com.softalpha0.secondguess",
+    "productName": "Second Guess",
+    "artifactName": "Second-Guess-Setup-${version}.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/main/**",
+      "dist/renderer/**",
+      "decks/**",
+      "package.json",
+      "!node_modules/@smartspectra/node-sdk-*/**",
+      "!node_modules/@smartspectra/node-sdk/samples/**",
+      "!node_modules/@smartspectra/node-sdk/docs/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/koffi/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "extraResources": [
+        {
+          "from": "node_modules/@smartspectra/node-sdk-win32-${arch}/",
+          "to": "smartspectra"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "artifactName": "Second-Guess-Setup-${version}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ],
+      "extraResources": [
+        {
+          "from": "node_modules/@smartspectra/node-sdk-linux-${arch}/",
+          "to": "smartspectra"
+        }
+      ]
+    },
+    "mac": {
+      "extraResources": [
+        {
+          "from": "node_modules/@smartspectra/node-sdk-darwin-${arch}/",
+          "to": "smartspectra"
+        }
+      ],
+      "extendInfo": {
+        "NSCameraUsageDescription": "Second Guess uses the camera to notice hesitation while you recall answers. No video is stored."
+      }
+    },
+    "publish": null
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/softalpha0/second-guess.git"
   }
 }

@@ -7,3 +7,4 @@ sdk-reports/
 .DS_Store
 *.zip
 *.patch
+release/

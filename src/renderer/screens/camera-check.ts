@@ -57,7 +57,7 @@ export const cameraCheckScreen: Screen = async (root, go, params) => {
   async function startCamera(): Promise<void> {
     if (camera.state.on || starting) return;
     if (info.loadError) return showProblem(`The camera SDK could not load on this computer: ${info.loadError}`);
-    if (!info.hasKey) return showProblem('No Presage API key found (SMARTSPECTRA_API_KEY in the .env file). You can still study without the camera.');
+    if (!info.hasKey) return showProblem('No Presage API key yet. Add one in Settings, or study without the camera.');
     starting = true;
     showProblem(null);
     const r = await window.sg.start(select.value || null);

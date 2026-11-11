@@ -87,6 +87,11 @@ export class SdkSession {
     private emit: (e: SdkEvent) => void,
   ) {}
 
+  /** A new key from Settings applies from the next camera start. */
+  setApiKey(key: string | undefined): void {
+    this.apiKey = key;
+  }
+
   /** Load the SDK lazily so a broken native runtime doesn't crash the app. */
   private load(): SdkModule | null {
     if (this.mod || this.loadError) return this.mod;
@@ -129,7 +134,7 @@ export class SdkSession {
   async start(cameraId: string | null): Promise<{ ok: boolean; error?: string }> {
     const mod = this.load();
     if (!mod) return { ok: false, error: `SDK could not load: ${this.loadError}` };
-    if (!this.apiKey) return { ok: false, error: 'No API key. Add SMARTSPECTRA_API_KEY to the .env file.' };
+    if (!this.apiKey) return { ok: false, error: 'No Presage API key. Add one in Settings.' };
     if (this.running) return { ok: true };
     this.cameraId = cameraId;
     this.setIndex = 0;

@@ -242,3 +242,4 @@ input[type=range] { width: 280px; accent-color: var(--accent); }
 .keys-table { border-collapse: collapse; margin-bottom: 14px; }
 .keys-table td { padding: 5px 12px 5px 0; vertical-align: top; }
 .keys-table td:first-child { white-space: nowrap; }
+.key-input { flex: 1; min-width: 240px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font: inherit; }

@@ -23,6 +23,10 @@ const api: SgApi = {
   getReviews: () => ipcRenderer.invoke('store:get-reviews'),
   deleteAllData: () => ipcRenderer.invoke('store:delete-all'),
   exportCsv: () => ipcRenderer.invoke('store:export-csv'),
+  keyStatus: () => ipcRenderer.invoke('key:status'),
+  saveKey: (key) => ipcRenderer.invoke('key:save', key),
+  removeKey: () => ipcRenderer.invoke('key:remove'),
+  openKeyPage: () => ipcRenderer.invoke('open:get-key-page'),
   onEvent: (cb) => {
     const listener = (_e: IpcRendererEvent, ev: SdkEvent) => cb(ev);
     ipcRenderer.on('sdk:event', listener);

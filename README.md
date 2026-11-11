@@ -79,9 +79,18 @@ Pulse is measured by the SDK but has **weight 0**: on a laptop webcam it updated
 - Study data stays in local files on your computer. **Settings → Delete all data** removes it.
 - No AI services are used.
 
-## Run it
+## Download (Windows)
 
-Requires Node.js 22 (or newer), a webcam and a Presage API key.
+1. Download **`Second-Guess-Setup-1.0.0.exe`** from the [Releases page](https://github.com/softalpha0/second-guess/releases).
+2. Run it. Windows may show **"Windows protected your PC"** because this hackathon app isn't code-signed: click **More info → Run anyway**.
+3. Open Second Guess → **Settings → Presage API key**: create a free key at [physiology.presagetech.com](https://physiology.presagetech.com/) and paste it. It's stored encrypted on your computer (Windows DPAPI).
+4. Pick a deck and study. No key or no webcam? It still works as plain flashcards.
+
+Needs Windows 10/11 (64-bit), a webcam and an internet connection (the SDK checks the key and downloads its models). The installer is large (~150 MB) because it includes Electron and the SmartSpectra runtime.
+
+## Run from source
+
+Requires Node.js 22 (or newer), a webcam and a Presage API key (in `.env` or in Settings).
 
 ```bash
 git clone https://github.com/softalpha0/second-guess.git
@@ -100,6 +109,7 @@ Other commands:
 | `npm test` | Runs the automatic tests (scoring, scheduling, import, …) |
 | `npm run probe` | Checks the SDK without opening a window (45 s), writes a field report to `sdk-reports/` |
 | `npm run tune` | Shows how well each threshold matched your Check-mode answers |
+| `npm run dist` | Builds the Windows installer into `release/` (run on Windows) |
 
 ## Keyboard
 

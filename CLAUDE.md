@@ -72,6 +72,13 @@ Rules:
   to KNOWN cards (warm-up "2+2" pace too fast vs real cards). Fix: recall reference = max(1.5× warm-up median,
   median of this session's reading-adjusted right first answers once ≥4). blink/breath/expression gave 0 on all 10.
   Old reviews keep their old scores (raw signals aren't stored), so judge the fix on NEW Check-mode answers.
+- Installer: electron-builder (NSIS, win x64) via `npm run dist` on Windows → release/Second-Guess-Setup-<ver>.exe.
+  SDK runtime shipped as resources/smartspectra (extraResources); main.ts sets SMARTSPECTRA_CAPI_PATH when packaged;
+  koffi unpacked from asar; platform SDK packages excluded from asar. `npm run dist:dir` builds an unpacked folder
+  (verified on Linux 2026-11-11: SDK 3.5.0 loads, decks read from asar).
+- API key: Settings → encrypted with Electron safeStorage (DPAPI) in userData/presage-key.bin; Settings key beats .env;
+  window only ever sees "source + last 4 chars". .env is ignored in the installed app. Never ship a key in the app.
+- userData forced to <appData>/second-guess for dev and installed builds alike.
 - Fresh-clone check 2026-11-11: npm ci + 99 tests + build pass.
 
 ## SDK findings (M1)
