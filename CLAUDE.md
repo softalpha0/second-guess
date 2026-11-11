@@ -22,9 +22,7 @@ Rules:
 
 ## SDK findings (M1)
 
-Status: SDK code paths verified in the cloud dev box (Linux, no camera). **Live on-PC fields are pending
-the first run on the Windows PC** — copy the facts from `sdk-reports/sdk-fields-*.json` into the
-"Seen on this PC" lines below.
+Status: **M1 done** — verified on the Windows PC on 2026-11-11 (see "Seen on this PC").
 
 **Setup facts**
 - Package `@smartspectra/node-sdk@3.5.0`. Pure FFI (koffi) — no native build step. Installs the native
@@ -54,13 +52,27 @@ the first run on the Windows PC** — copy the facts from `sdk-reports/sdk-field
   `kInputUnavailable` (app shows it, camera indicator stays off). The SDK prints its own `E…/W…` log lines to the
   terminal — they're normal noise unless the app shows an error.
 
-**Seen on this PC (fill in from the field report)**
-- Fields the SDK actually sends on this PC: _pending_
-- Metric set accepted for our key: _pending_
-- Expression names available: schema allows ANGRY, CONTEMPT, DISGUST, FEAR, HAPPY, NEUTRAL, SAD, SURPRISE — _which arrive: pending_
-- Landmarks available (for gaze/head direction): schema gives 2-D points per frame — _point count and coordinate range: pending_
-- Metric update rate: _pending_ (messages/sec in the report)
-- Are arrays cumulative or one reading per message? _pending_ (compare minLength/maxLength in the report)
+**Seen on this PC** (Windows x64, HP Full-HD Camera, 77 s run, 2026-11-11)
+- Metric set accepted for our key: **full** — breathing, pulse, landmarks, blinking, talking, expressions. No errors.
+- Camera signal: Ok 1542×, TooDark 5×. Status flow Idle → Starting → Running → Stopping.
+- Update rate: ~20 messages/s. Each reading is sent **once** (not cumulative); a message carries 1–5 new
+  readings per signal. Timestamps are microseconds (wall-clock-like), shared across signals.
+- Fields the SDK actually sends, and how often in 77 s:
+  | Field | Readings | Notes |
+  |---|---|---|
+  | `breathing.upperTrace[].value` | 1393 (~25/s) | range about −3…+4; usable for breath-hold (flat trace) |
+  | `breathing.rate[].value` | 11 | 10–26 /min; too slow for a per-card signal |
+  | `cardio.pulseRate[].value` | **2** | confidence 0–100 (59, 78). Can arrive late/out of order. **Too sparse for per-card use** |
+  | `face.blinking[]` | 1075 (~25/s, one per frame) | `detected` is **omitted when false** (protobuf default); 24 frames had `true` |
+  | `face.talking[]` | 1075 | `detected` omitted when false; 222 frames `true` |
+  | `face.landmarks[].value` | 1413 (~25/s) | **478 points** = face mesh 468 + 10 iris points (468–477). Integer **pixel** coords in the 1280×720 frame (x 485–659, y 310–404 → face ≈175 px wide) |
+  | `face.expression[].scores` | 1208 (~25/s) | always 8 scores, confidence **0–100** |
+- Expression names available: ANGRY, CONTEMPT, DISGUST, FEAR, HAPPY, NEUTRAL, SAD, SURPRISE (all 8 arrive).
+- Landmarks for gaze/head direction: yes. Plan: head turn from nose tip (1) vs face sides (234, 454) and
+  forehead/chin (10, 152); eye direction from iris centres (468, 473) between eye corners (33/133, 263/362).
+  Integer pixels make iris offset coarse (a few px), so head turn will likely carry "looked away"; tune in M6.
+- Implications for §5: pulse → weight 0 per card (keep code path, maybe session-level only); breathing rate not used
+  per card, breath hold uses `upperTrace`; blinks/landmarks/expressions are frame-rate and fine for a 2–10 s recall window.
 
 **What the SDK sends to Presage** (Telemetry & Privacy page + what we observed)
 - With telemetry ON (default) it sends session summaries (SDK version, OS/device model, CPU arch, frame-rate and

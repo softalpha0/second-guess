@@ -64,7 +64,7 @@ function setCamera(on: boolean): void {
 function fmtReading(r: { value: number; confidence?: number; stable?: boolean } | null, digits = 0): [string, string] {
   if (!r) return ['—', ''];
   const parts: string[] = [];
-  if (r.confidence !== undefined) parts.push(`confidence ${r.confidence.toFixed(2)}`);
+  if (r.confidence !== undefined) parts.push(`confidence ${r.confidence.toFixed(0)}`);
   if (r.stable !== undefined) parts.push(r.stable ? 'stable' : 'settling');
   return [r.value.toFixed(digits), parts.join(' · ')];
 }
@@ -111,10 +111,12 @@ function renderLive(s: LiveSnapshot, perSec: number): void {
         track.className = 'track';
         const fill = document.createElement('div');
         fill.className = 'fill';
-        fill.style.width = `${Math.max(0, Math.min(1, e.score)) * 100}%`;
+        // SDK scores are 0–100 on this PC (seen in M1); handle 0–1 too
+        const pct = e.score > 1 ? e.score : e.score * 100;
+        fill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
         track.append(fill);
         const val = document.createElement('span');
-        val.textContent = e.score.toFixed(2);
+        val.textContent = e.score.toFixed(1);
         row.append(name, track, val);
         return row;
       }),

@@ -68,6 +68,7 @@ export class SdkSession {
   private schema: FieldSchema = createSchema();
   private samples: unknown[] = [];
   private startedAt = 0;
+  private stoppedAt = 0;
   private messageCount = 0;
   private rateWindow: number[] = [];
   private validationSeen: Record<string, number> = {};
@@ -137,6 +138,7 @@ export class SdkSession {
     this.schema = createSchema();
     this.samples = [];
     this.startedAt = Date.now();
+    this.stoppedAt = 0;
     this.messageCount = 0;
     this.rateWindow = [];
     this.validationSeen = {};
@@ -247,7 +249,9 @@ export class SdkSession {
   }
 
   report(): FieldReport {
-    const durationSec = this.startedAt ? (Date.now() - this.startedAt) / 1000 : 0;
+    // measure until Stop, not until the report is saved
+    const end = this.stoppedAt || Date.now();
+    const durationSec = this.startedAt ? (end - this.startedAt) / 1000 : 0;
     const set = this.mod ? METRIC_SETS[this.setIndex] : null;
     return {
       createdAt: new Date().toISOString(),
@@ -269,7 +273,10 @@ export class SdkSession {
   private async teardown(): Promise<void> {
     const sdk = this.sdk;
     this.sdk = null;
-    if (this.running) this.emit({ type: 'camera', on: false });
+    if (this.running) {
+      this.stoppedAt = Date.now();
+      this.emit({ type: 'camera', on: false });
+    }
     this.running = false;
     if (!sdk) return;
     try {

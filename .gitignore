@@ -5,3 +5,5 @@ out/
 *.log
 sdk-reports/
 .DS_Store
+*.zip
+*.patch
