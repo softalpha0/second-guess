@@ -1,4 +1,7 @@
-# Making the Windows installer and putting it on GitHub
+# Making the Windows download and putting it on GitHub
+
+> Quickest path: the portable `.exe` (one file, no install) was already built for v1.0.0. Test it (step 2,
+> skipping the install part), then upload it (step 3). `npm run dist:portable` rebuilds it.
 
 Do this on your Windows PC, after the feature freeze (Nov 20) so the installer has the final version.
 
@@ -28,7 +31,7 @@ When it finishes, the installer is at `release\Second-Guess-Setup-1.0.0.exe` (ab
    > Flashcards that notice when you're guessing. Windows 10/11 installer.
    > After installing, add your free Presage API key in Settings (physiology.presagetech.com).
    > Windows may warn that the app isn't signed: More info → Run anyway.
-5. Drag `Second-Guess-Setup-1.0.0.exe` into the "Attach binaries" box. Wait for the upload to finish.
+5. Drag `Second-Guess-1.0.0-portable.exe` (and/or `Second-Guess-Setup-1.0.0.exe`) into the "Attach binaries" box. Wait for the upload to finish.
 6. **Publish release**.
 
 ## Important

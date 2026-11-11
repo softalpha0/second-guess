@@ -9,6 +9,7 @@ A desktop flashcard app that watches for hesitation *while you recall* an answer
 | | |
 |---|---|
 | 🎬 **Demo video (1:27)** | https://youtu.be/Bw7pHNqaJRY |
+| 💻 **Download (Windows)** | [Second-Guess-1.0.0-portable.exe](https://github.com/softalpha0/second-guess/releases/latest) — one file, no install. See [Download](#download-windows) |
 | 📝 **DEV post** | https://dev.to/softalpha_0/second-guess-flashcards-that-notice-when-youre-guessing-4d9n |
 | 🧾 **Evidence** | [docs/evidence](docs/evidence/) — SDK field report from a real run, honest accuracy results, test results |
 
@@ -58,7 +59,7 @@ All taken from the real app on my laptop with a real webcam.
 | Signal replay for a card | ✅ |
 | Progress over days, CSV export, light/dark theme, shortcut overlay (`?`) | ✅ |
 | Settings: threshold, signals on/off, camera, API key, delete all data | ✅ |
-| Windows installer | build config ready (`npm run dist`), not published yet |
+| Windows download (portable `.exe`, no install needed) | ✅ |
 
 ## How it responds to human signals (use of the technology)
 
@@ -130,6 +131,15 @@ test/          Vitest tests for src/core and storage
 docs/          evidence/ · screenshots/ · video/ · dev-post.md
 ```
 
+## Download (Windows)
+
+1. Download **`Second-Guess-1.0.0-portable.exe`** from the [latest release](https://github.com/softalpha0/second-guess/releases/latest). It's one file (~140 MB) — no installation.
+2. Double-click it. Windows may show **"Windows protected your PC"** because this hackathon app isn't code-signed: **More info → Run anyway**. The first start takes a few seconds while it unpacks.
+3. **Settings → Presage API key**: create a free key at [physiology.presagetech.com](https://physiology.presagetech.com/) and paste it (stored encrypted on your computer).
+4. Pick a deck and study. No key or webcam? It still works as plain flashcards.
+
+Needs Windows 10/11 (64-bit), a webcam and an internet connection. Your study data is kept in `%APPDATA%\second-guess`.
+
 ## Run it locally
 
 Requires Node.js 22+, a webcam and a Presage API key.
@@ -149,7 +159,8 @@ npm start
 | `npm test` | Runs the automated tests |
 | `npm run probe` | Checks the SDK without a window (45 s) and writes a field report to `sdk-reports/` |
 | `npm run tune` | Shows how well each threshold matched your Check-mode answers |
-| `npm run dist` | Builds the Windows installer into `release/` (run on Windows) |
+| `npm run dist:portable` | Builds the portable Windows `.exe` into `release/` (works on Windows and Linux) |
+| `npm run dist` | Builds the installer + portable `.exe` (the installer needs Windows) |
 
 **Keys:** `Space` reveal / next · `→` / `←` right / wrong · `H` change the verdict · `Y` / `N` Check mode · `?` all shortcuts.
 

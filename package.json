@@ -17,7 +17,8 @@
     "build:tune": "esbuild src/probe/tune.ts --bundle --platform=node --format=cjs --target=node22 --outfile=dist/probe/tune.js --log-level=warning",
     "tune": "npm run build:tune && node dist/probe/tune.js",
     "dist": "npm run build && electron-builder --win --x64",
-    "dist:dir": "npm run build && electron-builder --dir"
+    "dist:dir": "npm run build && electron-builder --dir",
+    "dist:portable": "npm run build && electron-builder --win portable --x64"
   },
   "dependencies": {
     "@smartspectra/node-sdk": "^3.5.0",
@@ -64,6 +65,12 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "extraResources": [
@@ -101,7 +108,10 @@
         "NSCameraUsageDescription": "Second Guess uses the camera to notice hesitation while you recall answers. No video is stored."
       }
     },
-    "publish": null
+    "publish": null,
+    "portable": {
+      "artifactName": "Second-Guess-${version}-portable.${ext}"
+    }
   },
   "repository": {
     "type": "git",
