@@ -67,8 +67,8 @@ export const decksScreen: Screen = async (root, go) => {
   }
 
   const modeLine = session.noCamera
-    ? h('p.small.muted', {}, 'Studying without camera (plain flashcards). ',
-        h('button.linkish', { onclick: () => { session.noCamera = false; go('decks'); } }, 'Use the camera again'))
+    ? h('div.notice', {}, 'You chose to study without the camera (plain flashcards). ',
+        h('button.btn.small', { onclick: () => { session.noCamera = false; go('decks'); } }, 'Use the camera again'))
     : null;
 
   root.append(
